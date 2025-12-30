@@ -66,12 +66,13 @@ export default function Header() {
   useEffect(()=>{
     fetchCategories()
   },[])
-  useEffect(() => {
+ useEffect(() => {
   const storedUser = localStorage.getItem("user");
   if (storedUser) {
-    (setCredentials({ user: JSON.parse(storedUser) }));
+    dispatch(setCredentials({ user: JSON.parse(storedUser) }));
   }
 }, [dispatch]);
+
 
     // 🔥 التحقق إذا كان المستخدم مدير
     const role = user?.role?.toLowerCase();

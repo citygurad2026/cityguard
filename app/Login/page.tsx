@@ -36,7 +36,7 @@ export default function Login() {
     dispatch(
       setCredentials({
         user: {
-          ...response.data.user,
+          ...response.data.data,
           accessToken: response.data.accessToken,
         },
       })
