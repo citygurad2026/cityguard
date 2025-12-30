@@ -17,7 +17,7 @@ export default function Register() {
 const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
-  const formData = new FormData(e.currentTarget); // safer in TS
+  const formData = new FormData(e.currentTarget); 
   const username = formData.get("username") as string;
   const password = formData.get("password") as string;
   const name = formData.get("name") as string;
@@ -30,14 +30,12 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     });
     if(response.data.ok){
        toast.success("تم إنشاء الحساب بنجاح!");
+        e.currentTarget.reset();
     }
    
-
-    // مسح الحقول
-    e.currentTarget.reset();
-
-    // التوجيه للصفحة
+   setTimeout(() => {
     router.push("/Login");
+  }, 800);
   } catch (err: any) {
     console.error("خطأ:", err.response?.data || err.message);
     toast.error(err.response?.data?.message || "حدث خطأ أثناء التسجيل");
