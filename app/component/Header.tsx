@@ -4,11 +4,12 @@ import logo from '@/public/logo.png'
 import { Menu, X, User, LogIn, Settings, icons, Tag, User2Icon } from "lucide-react"; // أضفت Settings
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import Axios from '../utilts/Axios';
 import SummaryApi from '../common/SummaryApi';
 import { count } from 'console';
+import { setCredentials } from '../store/userSlice';
 interface Category {
   id: number;
   name: string;
@@ -21,7 +22,7 @@ export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-    
+    const dispatch=useDispatch()
    const navItems = [
   { name: "الأعمال", href: "/businesses" },
   { name: "الفئات", 
@@ -65,6 +66,13 @@ export default function Header() {
   useEffect(()=>{
     fetchCategories()
   },[])
+  useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    (setCredentials({ user: JSON.parse(storedUser) }));
+  }
+}, [dispatch]);
+
     // 🔥 التحقق إذا كان المستخدم مدير
     const role = user?.role?.toLowerCase();
     const isAdmin = role === "admin";
