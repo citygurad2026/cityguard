@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import EditProfilePage from "../UserProfileEdit/page";
 import Link from "next/link";
-import { clearSession } from "../store/userSlice";
+
 import toast from "react-hot-toast";
 type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
 
@@ -76,14 +76,14 @@ export default function ProfilePage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
-  const router = useRouter();
-  const dispatch = useDispatch();
+   const router = useRouter()
+
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-         if (!user || !user.accessToken) {
+         if (!user ) {
         toast.error("يرجى تسجيل الدخول أولاً");
          setLoading(false);
          return
@@ -104,27 +104,9 @@ export default function ProfilePage() {
     fetchUserData();
   }, [user, router]);
 
-const handleLogout = () => {
-  try {
-    dispatch(clearSession());
-    // 1. إعادة تعيين بيانات المستخدم
-    setUserData(null);
-    
-    // 2. تنظيف جميع الـ tokens من localStorage
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken"); // ← هذا مهم جداً
-    localStorage.removeItem("userData");
-    
-    // 3. تنظيف sessionStorage
-    sessionStorage.clear();
-    
-    console.log("Logout successful");
-    router.push("/");
-    
-  } catch (err) {
-    console.error("Logout error:", err);
-  }
-};
+
+
+
 
   const stats = [
     {
@@ -201,15 +183,25 @@ const handleLogout = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-2">
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-emerald-700 bg-clip-text text-transparent">
                   الملف الشخصي
                 </h1>
                 <p className="text-gray-600 mt-2">مرحباً بك في صفحتك الشخصية</p>
               </div>
+              <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push("/")}
+            className=" text-green-700 hover:text-gray-600 transition-colors duration-300 mt-2"
+          >
+            العودة للصفحة الرئيسية
+          </motion.button>
             </div>
+            
           </motion.div>
+          
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Profile Sidebar */}
@@ -333,16 +325,6 @@ const handleLogout = () => {
                     <Edit3 className="w-4 h-4" />
                     تعديل الملف الشخصي
                   </Link>
-
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    تسجيل الخروج
-                  </motion.button>
                 </div>
               </div>
             </motion.div>

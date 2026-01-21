@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -38,6 +38,20 @@ interface FormData {
   website: string;
   openingHours: OpeningHours;
   featured?: boolean;
+}
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  imageUrl: string | null;
+  parentId: number | null;
+  sortOrder: number;
+  isActive: boolean;
+  children?: Category[];
+  _count?: {
+    businesses: number;
+  };
 }
 
 interface ImageFile {
@@ -180,7 +194,7 @@ export default function AddBusiness() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
   const [images, setImages] = useState<ImageFile[]>([]);
-
+  
   const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
@@ -431,7 +445,26 @@ const handleSubmit = async (e: React.FormEvent) => {
     if (!formData.city) return GENERAL_REGIONS;
     return REGIONS_BY_CITY[formData.city] || GENERAL_REGIONS;
   };
-
+    const [categories, setCategories] = useState<Category[]>([]);
+   useEffect(()=>{
+      const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const response=await Axios({
+        ...SummaryApi.category.get_categories
+      })
+      if (response.data.success) {
+        setCategories(response.data.data);
+      }
+    } catch (error) {
+      console.error('خطأ في جلب التصنيفات:', error);
+      toast.error('فشل في جلب التصنيفات');
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchCategories()
+  },[])
   return (
     <div
       className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 font-cairo p-4"
@@ -492,7 +525,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         <motion.form
           id="business-form"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}    
+          animate={{ opacity: 1, y: 0 }}
           onSubmit={handleSubmit}
           className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 space-y-8"
         >
@@ -525,28 +558,23 @@ const handleSubmit = async (e: React.FormEvent) => {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block font-semibold text-gray-700">
-                      التصنيف *
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      الفئة 
                     </label>
                     <select
                       name="categoryId"
                       value={formData.categoryId}
                       onChange={handleChange}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                       required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     >
-                      <option value="">اختر التصنيف</option>
-                      <option value="1">مطاعم</option>
-                      <option value="2">مقاهي</option>
-                      <option value="3">محلات تجارية</option>
-                      <option value="4">خدمات</option>
-                      <option value="5">تسوق</option>
-                      <option value="6">سياحة</option>
-                      <option value="7">صحة وجمال</option>
-                      <option value="8">تعليم</option>
-                      <option value="9">نقل ومواصلات</option>
-                      <option value="10">أخرى</option>
+                      <option value="">اختر فئة</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -881,61 +909,58 @@ const handleSubmit = async (e: React.FormEvent) => {
               </motion.div>
             )}
           </AnimatePresence>
-
-         
         </motion.form>
-         {/* Navigation buttons */}
-          <div className="flex justify-between pt-6 border-t">
+        {/* Navigation buttons */}
+        <div className="flex justify-between pt-6 border-t">
+          <motion.button
+            type="button"
+            onClick={prevTab}
+            disabled={activeTab === "basic"}
+            className={`px-8 py-3 rounded-xl font-semibold transition-all ${
+              activeTab === "basic"
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-gray-600 text-white hover:bg-gray-700"
+            }`}
+            whileHover={activeTab !== "basic" ? { scale: 1.05 } : {}}
+            whileTap={activeTab !== "basic" ? { scale: 0.95 } : {}}
+          >
+            السابق
+          </motion.button>
+
+          {activeTab !== "media" ? (
             <motion.button
               type="button"
-              onClick={prevTab}
-              disabled={activeTab === "basic"}
-              className={`px-8 py-3 rounded-xl font-semibold transition-all ${
-                activeTab === "basic"
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-gray-600 text-white hover:bg-gray-700"
-              }`}
-              whileHover={activeTab !== "basic" ? { scale: 1.05 } : {}}
-              whileTap={activeTab !== "basic" ? { scale: 0.95 } : {}}
+              onClick={nextTab}
+              className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 transition-all flex items-center gap-2"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              السابق
+              التالي
+              <ArrowRight className="w-5 h-5" />
             </motion.button>
-
-            {activeTab !== "media" ? (
-              <motion.button
-                type="button"
-                onClick={nextTab}
-                className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 transition-all flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                التالي
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-            ) : (
-              <motion.button
-                type="submit"
-                form="business-form"
-                disabled={loading}
-                className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-all flex items-center gap-2"
-                whileHover={!loading ? { scale: 1.05 } : {}}
-                whileTap={!loading ? { scale: 0.95 } : {}}
-              >
-                {loading ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    جارٍ الإرسال...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    إنشاء العمل
-                  </>
-                )}
-              </motion.button>
-            )}
-          </div>
-       
+          ) : (
+            <motion.button
+              type="submit"
+              form="business-form"
+              disabled={loading}
+              className="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-all flex items-center gap-2"
+              whileHover={!loading ? { scale: 1.05 } : {}}
+              whileTap={!loading ? { scale: 0.95 } : {}}
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  جارٍ الإرسال...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  إنشاء العمل
+                </>
+              )}
+            </motion.button>
+          )}
+        </div>
       </div>
     </div>
   );

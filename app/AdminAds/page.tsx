@@ -77,7 +77,7 @@ useEffect(() => {
 }, []);
 
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -555,7 +555,7 @@ useEffect(() => {
                           <div className="flex flex-col gap-1">
                             <div className="flex gap-1">
                               <button
-                                onClick={() => router.push(`/AdminAds/edit/${ad.id}`)}
+                                onClick={() => router.push(`/AdminAdsEdit/${ad.id}`)}
                                 className="p-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex-1 flex justify-center"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />

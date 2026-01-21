@@ -266,7 +266,7 @@ export default function OwnerAdsPage() {
   };
 
   const editAd = (ad: Ad) => {
-    router.push(`/owner/ads/edit/${ad.id}`);
+    router.push(`/OwnerAdsEdit/${ad.id}`);
   };
 
   const getStatusBadge = (status: string) => {
@@ -525,7 +525,7 @@ export default function OwnerAdsPage() {
               <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد إعلانات</h3>
               <p className="text-gray-600 mb-6">ابدأ بإنشاء أول إعلان لمتجرك</p>
               <button
-                onClick={() => router.push("/create-ad")}
+                onClick={() => router.push("/OwnerAdsAdd")}
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all"
               >
                 إنشاء أول إعلان

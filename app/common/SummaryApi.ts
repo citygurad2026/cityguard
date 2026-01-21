@@ -1,4 +1,7 @@
 "use client";
+
+import { param } from "framer-motion/m";
+
 export const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const SummaryApi = {
@@ -15,6 +18,10 @@ const SummaryApi = {
     login: {
       method: "POST",
       url: `${baseURL}/api/users/login`,
+    },
+    logout: {
+      method: "POST",
+      url: `${baseURL}/api/users/logout`,
     },
   
 
@@ -33,6 +40,10 @@ const SummaryApi = {
     updateUser: (id: number | string) => ({
       method: "PATCH",
       url: `${baseURL}/api/users/update/${id}`,
+    }),
+    updateProfile:(id:number |string)=>({
+      method:"PATCH",
+      url:`${baseURL}/api/users/updateprofile/${id}`
     }),
 
     // delete user (ADMIN only)
@@ -58,10 +69,11 @@ const SummaryApi = {
       method: "GET",
       url: `${baseURL}/api/bus/getbusinesses`,
     },
-     get_bus_by_id: (id: number | string) => ({
-      method: "GET",
-      url: `${baseURL}/api/bus/getbusinesse/${id}` 
-    }),
+   get_bus_by_user: {
+    method: "GET",
+    url: `${baseURL}/api/bus/getbusinesse`  
+    },
+
       updateBus: (id: number | string) => ({
       method: "PUT",
       url: `${baseURL}/api/bus/updatebusinesses/${id}` 
@@ -112,13 +124,16 @@ const SummaryApi = {
   },
   ad:{
      get_public_ads: {
-    method: "GET",
-    url: `${baseURL}/api/ads/get-public`,
+        method: "GET",
+        url: `${baseURL}/api/ads/get-public`,
   },
 
   get_ads_by_type: (type: string) => ({
     method: "GET",
     url: `${baseURL}/api/ads/get-adstype/${type}`,
+    params:{
+      _t:Date.now()
+    }
   }),
 
   increment_clicks: (id: number | string) => ({
@@ -158,9 +173,6 @@ const SummaryApi = {
   update_ad: (id: number | string) => ({
     method: "PUT",
     url: `${baseURL}/api/ads/update-ad/${id}`,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
   }),
 
   delete_ad: (id: number | string) => ({

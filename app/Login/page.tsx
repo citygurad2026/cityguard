@@ -6,20 +6,19 @@ import { LogIn, Lock, Eye, EyeOff, User } from 'lucide-react';
 import Link from 'next/link';
 import SummaryApi from '../common/SummaryApi';
 import Axios from '../utilts/Axios';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/userSlice';
 import { useRouter } from 'next/navigation';
-import { RootState } from '../store/store';
+
 export default function Login() {
   const dispatch=useDispatch();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const user = useSelector((state: RootState) => state.user.user);
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
   const form = e.currentTarget;
-
   const username = (form.elements.namedItem("username") as HTMLInputElement).value;
   const password = (form.elements.namedItem("password") as HTMLInputElement).value;
 
@@ -29,16 +28,14 @@ export default function Login() {
       data: { username, password },
     });
 
+    // 🔹 احفظ التوكن وبيانات المستخدم
     localStorage.setItem("accessToken", response.data.accessToken);
-    localStorage.setItem("refreshToken", response.data.refreshToken);
-    localStorage.setItem("user", JSON.stringify(response.data.user));
+    localStorage.setItem("user", JSON.stringify(response.data.data)); // ⚠️ data وليس user
 
+    // 🔹 حدث Redux بشكل صحيح
     dispatch(
       setCredentials({
-        user: {
-          ...response.data.data,
-          accessToken: response.data.accessToken,
-        },
+        user: response.data.data, // ⚠️ data وليس user
       })
     );
 
@@ -48,6 +45,7 @@ export default function Login() {
     console.error("خطأ:", err.response?.data || err.message);
   }
 };
+
 
 
  

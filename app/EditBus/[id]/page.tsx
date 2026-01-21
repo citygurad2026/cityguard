@@ -59,7 +59,7 @@ export default function EditBusinessPage() {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.user.user);
   
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [business, setBusiness] = useState<Business | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -107,26 +107,15 @@ export default function EditBusinessPage() {
     friday: "الجمعة",
     saturday: "السبت"
   };
-
-  // جلب البيانات
-  useEffect(() => { 
-    if (user && id) {
-      fetchData(); 
-    }
-  }, [id, user]);
-
-  const fetchData = async () => {
+   const fetchData = async () => {
     try {
       setLoading(true);
       
       // جلب بيانات العمل
       const resBus = await Axios({
-        ...SummaryApi.owner.get_bus_by_id(parseInt(id as string)),
-        headers: { Authorization: `Bearer ${user?.accessToken}` }
+       ...SummaryApi.owner.get_bus_by_user, 
       });
-      
-      if (!resBus.data.ok) throw new Error(resBus.data.message || "فشل جلب بيانات العمل");
-
+ 
       const busData = resBus.data.data;
       setBusiness(busData);
       
@@ -222,6 +211,14 @@ export default function EditBusinessPage() {
       setLoading(false);
     }
   };
+  // جلب البيانات
+  useEffect(() => { 
+    if (user && id) {
+      fetchData(); 
+    }
+  }, [id, user]);
+
+ 
 
   // تحديث الحقول
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

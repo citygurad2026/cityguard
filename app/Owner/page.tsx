@@ -71,6 +71,7 @@ interface StoreUser {
 
 export default function OwnerDashboard() {
   const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
+  
   const router = useRouter();
   const dispatch = useDispatch();
   
@@ -85,81 +86,36 @@ export default function OwnerDashboard() {
     totalFavorites: 0,
     totalReviews: 0
   });
-
-  // ⬇️ تعديل دالة fetchOwnerData
-  const fetchOwnerData = async () => {
-    try {
-      setLoading(true);
-      
-      if (!user || !user.accessToken) {
+ 
+ const fetchOwnerData = async () => {
+  try {
+     if (!user ) {
         toast.error("يرجى تسجيل الدخول أولاً");
+         setLoading(false);
+         return
+         }
+    setLoading(true); // ⬅️ بعد التحقق فقط
+    // 1️⃣ جلب العمل الوحيد للمستخدم
+    const response = await Axios({
+      ...SummaryApi.owner.get_bus_by_user, 
+      headers: { Authorization: `Bearer ${user.accessToken}`}
+    });
+    
+    setBusiness(response.data.data || [])
+
+  } catch (err: any) {
+    console.error("Error:", err.response?.data || err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
   
-        return;
-      }
-
-      // 1. جلب العمل الوحيد للمستخدم
-      const response = await Axios({
-        ...SummaryApi.owner.get_bus,
-        headers: { 
-          Authorization: `Bearer ${user.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.data.ok) {
-        setBusiness(response.data.data);
-        
-        // 2. إذا كان هناك عمل، اجلب إحصائياته
-        if (response.data.data) {
-          const statsRes = await Axios({
-            ...SummaryApi.owner.getbusinessesState,
-            headers:{
-               Authorization: `Bearer ${user.accessToken}`,
-              'Content-Type': 'application/json'
-            }
-          })
-          if (statsRes.data.ok) {
-            setStats({
-              totalBusinesses: 1, // دائماً 1 لأن لكل مستخدم عمل واحد فقط
-              activeBusinesses: response.data.data.status === "APPROVED" ? 1 : 0,
-              pendingBusinesses: response.data.data.status === "PENDING" ? 1 : 0,
-              totalViews: statsRes.data.data.stats?.[0]?.views || 0,
-              totalFavorites: statsRes.data.data.favoritesCount || 0,
-              totalReviews: statsRes.data.data.totalReviews || 0
-            });
-          }
-        }
-      } else {
-        // إذا لم يكن هناك عمل
-        setBusiness(null);
-        setStats({
-          totalBusinesses: 0,
-          activeBusinesses: 0,
-          pendingBusinesses: 0,
-          totalViews: 0,
-          totalFavorites: 0,
-          totalReviews: 0
-        });
-      }
-      
-    } catch (err: any) {
-      console.error('Error:', err.response?.data || err.message);
-      
-      if (err.response?.status === 401) {
-        toast.error("انتهت صلاحية الجلسة");
-        dispatch(clearSession());
-        router.push('/Login');
-      } else {
-        toast.error("حدث خطأ في تحميل البيانات");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
     fetchOwnerData();
-  }, [user]);
+ 
+}, [user,router]);
+
 
   // ⬇️ تعديل دالة الحذف
   const deleteBusiness = async () => {
@@ -254,18 +210,7 @@ export default function OwnerDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    try {
-      dispatch(clearSession());
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("userData");
-      sessionStorage.clear();
-      router.push("/");
-    } catch (err) {
-      console.error("Logout error:", err);
-    }
-  };
+ 
   {/**==================== work show window=========== */}
 
   const [previewModal, setPreviewModal] = useState<{
@@ -357,16 +302,14 @@ const closePreviewModal = () => {
                 تحديث
               </motion.button>
 
-              {/* زر خروج */}
-              <motion.button
-                whileHover={{ y: -1 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleLogout}
-                className="flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200 border border-gray-200"
-              >
-                <LogOut className="w-4 h-4" />
-                تسجيل الخروج
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => router.push("/")}
+                  className=" text-gray-700 hover:text-gray-600 transition-colors duration-300 mt-2"
+                >
+                  العودة للصفحة الرئيسية
+                </motion.button>
             </div>
           </div>
         </motion.div>

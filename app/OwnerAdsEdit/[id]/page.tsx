@@ -4,9 +4,9 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import Axios from "../utilts/Axios";
-import SummaryApi from "../common/SummaryApi";
+import { RootState } from "@/app/store/store";
+import Axios from "@/app/utilts/Axios";
+import SummaryApi from "@/app/common/SummaryApi";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { 
@@ -67,7 +67,7 @@ export default function EditAdPage() {
   
   const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(false);
+
   const [isClient, setIsClient] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -101,14 +101,10 @@ export default function EditAdPage() {
     tabletImage: ""
   });
   
-  const [token, setToken] = useState<string | null>(null);
+ 
   const [adData, setAdData] = useState<Ad | null>(null);
 
-  useEffect(() => {
-    setIsClient(true);
-    const storedToken = typeof window !== 'undefined' ? localStorage.getItem("token") : null;
-    setToken(storedToken);
-  }, []);
+ 
 
   useEffect(() => {
     if (isClient && (!user || user.role !== "OWNER")) {
@@ -116,23 +112,16 @@ export default function EditAdPage() {
     }
   }, [user, router, isClient]);
 
-  useEffect(() => {
-    if (token && id) {
-      fetchAdData();
-    }
-  }, [token, id]);
+ 
 
   const fetchAdData = async () => {
+    setLoading(true)
     try {
-      setFetching(true);
+     console.log("start fetching advertis")
       const res = await Axios({
         ...SummaryApi.ad.get_ad_by_id(id),
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+       
       });
-
-      if (res.data && res.data.ad) {
         const ad = res.data.ad;
         setAdData(ad);
         
@@ -162,16 +151,21 @@ export default function EditAdPage() {
           mobileImage: ad.mobileImageUrl || "",
           tabletImage: ad.tabletImageUrl || ""
         });
-      }
+      
     } catch (error: any) {
       console.error("Error fetching ad:", error);
       toast.error(error.response?.data?.message || "فشل في تحميل بيانات الإعلان");
       router.push("/Owner");
     } finally {
-      setFetching(false);
+      setLoading(false);
     }
   };
 
+   useEffect(() => {
+   
+      fetchAdData();
+  
+  },[]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -241,11 +235,8 @@ export default function EditAdPage() {
       if (newImages.mobileImage) formDataToSend.append("mobileImage", newImages.mobileImage);
       if (newImages.tabletImage) formDataToSend.append("tabletImage", newImages.tabletImage);
       const res= await Axios({
-        ...SummaryApi.ad.update_ad,
+        ...SummaryApi.ad.update_ad(id),
         data: formDataToSend,
-        headers:{
-          Authorization: `Bearer ${token}`,
-        }
       })
 
       if (res.data.ok) {
@@ -262,7 +253,7 @@ export default function EditAdPage() {
     }
   };
 
-  if (!isClient || fetching) {
+  if ( loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6 flex items-center justify-center">
         <div className="text-center">

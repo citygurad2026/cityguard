@@ -72,26 +72,8 @@ export default function Admin() {
   const [usersData, setUsersData] = useState<UsersData[]>([]); // ⬅️ غيرت إلى مصفوفة
  const [activeUsers, setActiveUsers] = useState<any[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
- const dispatch=useDispatch()
- const handleLogout = () => {
-   try {
-     dispatch(clearSession());
-     
-     // 2. تنظيف جميع الـ tokens من localStorage
-     localStorage.removeItem("accessToken");
-     localStorage.removeItem("refreshToken"); // ← هذا مهم جداً
-     localStorage.removeItem("userData");
-     
-     // 3. تنظيف sessionStorage
-     sessionStorage.clear();
-     
-     console.log("Logout successful");
-     router.push("/");
-     
-   } catch (err) {
-     console.error("Logout error:", err);
-   }
- };
+
+
  
   // جلب التصنيفات
   const fetchCategories = async () => {
@@ -115,42 +97,49 @@ export default function Admin() {
     fetchCategories();
   }, []);
 
-  const fetchUsers = async () => {
+
+useEffect(()=>{
+   const fetchUsers = async () => {
     try {
       setLoading(true);
+       if (!user ) {
+        toast.error("يرجى تسجيل الدخول أولاً");
+         setLoading(false);
+         return
+         }
       const res = await Axios({
-        ...SummaryApi.user.get_all_users
+        ...SummaryApi.user.get_all_users,
+        headers: { Authorization: `Bearer ${user.accessToken}`}
       });
-      
-      // تأكد من معالجة البيانات بشكل صحيح
-      if (res.data && res.data.ok) {
+
         setUsersData(res.data.data || []);
-      } else if (Array.isArray(res.data)) {
-        setUsersData(res.data);
-      } else {
-        console.error("بيانات غير متوقعة:", res.data);
-        toast.error("بيانات غير متوقعة من الخادم");
-      }
     } catch (err) {
-      console.error("Error details:", err);
+      console.error("Error fetching users data:", err);
       toast.error("فشل في جلب المستخدمين");
     } finally {
       setLoading(false);
     }
   };
-
-const fetchActiveUsers = async () => {
+  fetchUsers()
+},[user,router])
+ 
+  useEffect(() => {
+    const fetchActiveUsers = async () => {
   try {
     const res = await Axios({ ...SummaryApi.user.get_active });
-    if (res.data.ok) {
+   
       // استخراج جميع الـ userId بدون تكرار
       const activeUserIds = [...new Set(res.data.data.map((s: any) => s.user.id))];
       setActiveUsers(activeUserIds);
-    }
+
   } catch (err) {
     console.error(err);
   }
 };
+
+    fetchActiveUsers()
+  }, [user, router]);
+
 
 
  const deleteUser = async (id: number) => {
@@ -182,10 +171,7 @@ const fetchActiveUsers = async () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-    fetchActiveUsers()
-  }, [user, router]);
+
 
   const handleClick = (id: number) => {
     router.push(`/EditUser/${id}`);
@@ -291,16 +277,7 @@ const fetchActiveUsers = async () => {
                     </Link>
                   </motion.button>
 
-                  {/* زر خروج بسيط وأنيق */}
-                  <motion.button
-                    whileHover={{ y: -1 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleLogout}
-                    className="flex items-center justify-center gap-2 px-5 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200 border border-gray-200"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    تسجيل الخروج
-                  </motion.button>
+                
                 </div>
 
                 <motion.button

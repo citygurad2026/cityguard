@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import Axios from "../utilts/Axios";
-import SummaryApi from "../common/SummaryApi";
+import { RootState } from "../../store/store";
+import Axios from "../../utilts/Axios";
+import SummaryApi from "../../common/SummaryApi";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { 
@@ -35,6 +35,7 @@ interface StoreUser {
   role: "ADMIN" | "OWNER";
   accessToken: string;
 }
+
 
 interface Business {
   id: number;
@@ -73,6 +74,7 @@ export default function OwnerCreateAdPage() {
   const [businesses, setBusinesses] = useState<Business| null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [businessesError, setBusinessesError] = useState<string | null>(null);
+   
   const [previews, setPreviews] = useState({
     image: "",
     mobileImage: "",
@@ -91,36 +93,35 @@ export default function OwnerCreateAdPage() {
       router.push("/");
     }
   }, [user, router, isClient]);
-
- useEffect(() => {
-  const fetchOwnerBusiness = async () => {
-    if(!user || !user.accessToken){
-        toast.error("يرجى تسجيل الدخول اولاً");
-        return
-    }
-    
+ const fetchOwnerBusiness = async () => {
     try {
-      const res = await Axios({
-        ...SummaryApi.owner.get_bus,
-        headers: {
-          Authorization: `Bearer ${user.accessToken}`,
-          'Content-Type':'application/json'
-        },
-      });
-      if (res.data.ok ) {
-          setBusinesses(res.data.data);
-        } else {
-          setBusinessesError("ليس لديك أي متاجر");
-        }
+        if (!user ) {
+        toast.error("يرجى تسجيل الدخول أولاً");
+         setLoading(false);
+         return
+         }
+    setLoading(true); // ⬅️ بعد التحقق فقط
+      const response = await Axios({
+      ...SummaryApi.owner.get_bus_by_user, 
+      headers: { Authorization: `Bearer ${user.accessToken}`}
+    });
+     console.log("response bis",response)
+          setBusinesses(response.data.data );
+          setFormData(prev=>({
+            ...prev,
+            targetId:response.data.data.id.toString()
+          }))
       
     } catch (error: any) {
       console.error("فشل جلب المتاجر", error);
       setBusinessesError("فشل في تحميل المتاجر");
-    }
+    }finally {
+    setLoading(false); // ⬅️ مهم ليتوقف الـ loading
+  }
   };
-
+ useEffect(() => {
   fetchOwnerBusiness();
-}, [user]);
+}, [user,router]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -198,7 +199,7 @@ export default function OwnerCreateAdPage() {
 
       if (res.data?.ok || res.data?.ad) {
         toast.success("تم إنشاء الإعلان بنجاح وتم إرساله للمراجعة");
-        router.push("/Owner");
+        router.push("/OwnerAds");
       } else {
         toast.error(res.data?.message || "حدث خطأ أثناء إنشاء الإعلان");
       }
@@ -221,10 +222,7 @@ export default function OwnerCreateAdPage() {
     );
   }
 
-  if (!user || user.role !== "OWNER") {
-    return null;
-  }
-  
+ 
 
   return (
     <div
@@ -329,22 +327,41 @@ export default function OwnerCreateAdPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        اختر المتجر *
+                        المتجر المستهدف
                       </label>
-                      <select
-                        name="targetId"
-                        value={formData.targetId}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                      >
-                        <option value="">اختر متجرك</option>
-                        {businesses && (
-                          <option key={businesses.id} value={businesses.id}>
-                            {businesses.name}
-                          </option>
-                        )}
-                      </select>
+
+                      {businesses ? (
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {businesses.name}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                سيتم الإعلان لهذا المتجر تلقائياً
+                              </p>
+                            </div>
+                            <Store className="w-5 h-5 text-blue-500" />
+                          </div>
+
+                          {/* ⬇️ حقل مخفي لإرسال الـ targetId */}
+                          <input
+                            type="hidden"
+                            name="targetId"
+                            value={businesses.id}
+                          />
+                        </div>
+                      ) : businessesError ? (
+                        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                          <p className="text-red-700">{businessesError}</p>
+                        </div>
+                      ) : (
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <p className="text-gray-600">
+                            جاري تحميل معلومات المتجر...
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 

@@ -1,6 +1,6 @@
 
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Axios from "../utilts/Axios";
 import { useSelector } from "react-redux";
@@ -8,6 +8,7 @@ import { RootState } from "../store/store";
 import SummaryApi from "../common/SummaryApi";
 import { motion } from "framer-motion";
 import { Building, MapPin, Phone, Globe, ArrowRight } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function NewBusinessForm() {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ export default function NewBusinessForm() {
   const [loading, setLoading] = useState(false);
   const user = useSelector((state: RootState) => state.user.user);
   const router = useRouter();
-
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -56,6 +57,7 @@ export default function NewBusinessForm() {
       [e.target.name]: e.target.value
     }));
   };
+ 
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 font-cairo" dir="rtl">
@@ -89,6 +91,7 @@ export default function NewBusinessForm() {
                 placeholder="أدخل اسم العمل التجاري"
               />
             </div>
+            
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

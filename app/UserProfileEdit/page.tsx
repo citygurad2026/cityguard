@@ -76,7 +76,7 @@ export default function EditProfilePage() {
     try {
       setSaving(true);
       await Axios({
-        ...SummaryApi.user.updateUser(user!.id),
+        ...SummaryApi.user.updateProfile(user!.id),
         headers: { Authorization: `Bearer ${user!.accessToken}` },
         data: formData,
       });
