@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import Axios from "../../utilts/Axios";
-import SummaryApi from "../../common/SummaryApi";
+import { RootState } from "../store/store";
+import Axios from "../utilts/Axios";
+import SummaryApi from "../common/SummaryApi";
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { 
