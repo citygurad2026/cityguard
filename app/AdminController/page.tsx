@@ -165,7 +165,7 @@ useEffect(()=>{
       await Promise.all(selectedUsers.map(id => Axios(SummaryApi.user.deleteUser(id))));
       toast.success(`✅ تم حذف ${selectedUsers.length} مستخدم`);
       setSelectedUsers([]);
-      fetchUsers();
+      
     } catch (err) {
       toast.error("فشل في الحذف الجماعي");
     }
