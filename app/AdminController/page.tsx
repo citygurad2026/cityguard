@@ -15,7 +15,6 @@ import {
   Users, 
   Shield,
   Eye,
-
   Download,
   RefreshCw,
   LogOut,
@@ -65,7 +64,6 @@ interface Category {
 export default function Admin() {
  const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
@@ -98,47 +96,43 @@ export default function Admin() {
   }, []);
 
 
-useEffect(()=>{
-   const fetchUsers = async () => {
+useEffect(() => {
+  const fetchUsers = async () => {
     try {
       setLoading(true);
-       if (!user ) {
-        toast.error("يرجى تسجيل الدخول أولاً");
-         setLoading(false);
-         return
-         }
       const res = await Axios({
-        ...SummaryApi.user.get_all_users,
-        headers: { Authorization: `Bearer ${user.accessToken}`}
+        ...SummaryApi.user.get_all_users
       });
-
-        setUsersData(res.data.data || []);
-    } catch (err) {
-      console.error("Error fetching users data:", err);
-      toast.error("فشل في جلب المستخدمين");
+      setUsersData(res.data.data || []);
     } finally {
       setLoading(false);
     }
   };
-  fetchUsers()
-},[user,router])
+
+  fetchUsers();
+}, []);
+
  
-  useEffect(() => {
-    const fetchActiveUsers = async () => {
-  try {
-    const res = await Axios({ ...SummaryApi.user.get_active });
-   
-      // استخراج جميع الـ userId بدون تكرار
-      const activeUserIds = [...new Set(res.data.data.map((s: any) => s.user.id))];
+ useEffect(() => {
+  const fetchActiveUsers = async () => {
+    try {
+      const res = await Axios({
+        ...SummaryApi.user.get_active
+      });
+
+      const activeUserIds = [
+        ...new Set(res.data.data.map((s: any) => s.user.id))
+      ];
+
       setActiveUsers(activeUserIds);
+    } catch (err) {
+      console.error("Error fetching active users:", err);
+    }
+  };
 
-  } catch (err) {
-    console.error(err);
-  }
-};
+  fetchActiveUsers();
+}, []);
 
-    fetchActiveUsers()
-  }, [user, router]);
 
 
 
@@ -277,7 +271,16 @@ useEffect(()=>{
                     </Link>
                   </motion.button>
 
-                
+                  {/* زر إدارة تبرعات الدم - الصحيح */}
+                  <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                    <Link
+                      href="/AdminBloodRequests"
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                    >
+                      <Layers className="w-5 h-5" />
+                      إدارة تبرعات الدم
+                    </Link>
+                  </motion.div>
                 </div>
 
                 <motion.button
@@ -497,7 +500,7 @@ useEffect(()=>{
                               setSelectedUsers((prev) => [...prev, user.id]);
                             } else {
                               setSelectedUsers((prev) =>
-                                prev.filter((id) => id !== user.id)
+                                prev.filter((id) => id !== user.id),
                               );
                             }
                           }}

@@ -25,7 +25,8 @@ import {
   BookUser,
   UserStarIcon,
   BriefcaseBusiness,
-  SettingsIcon
+  SettingsIcon,
+  UserCog
 } from 'lucide-react';
 
 import logo from '@/public/logo.png';
@@ -102,7 +103,7 @@ export default function Header() {
     { name: 'الأحداث', href: '/events'},
     { name: 'الوظائف', href: '/jobs' },
     { name: 'المحترفين', href: '/professionals' },
-    { name: 'التبرع بالدم', href: '/blood-requests'},
+    { name: 'التبرع بالدم', href: '/BloodDonation'},
     { name: 'المسابقات', href: '/competitions'},
   
   ];
@@ -287,18 +288,25 @@ export default function Header() {
     if (user) {
       return (
         <div className="hidden md:flex items-center space-x-3">
-          {userRole.hasSpecialAccess && (
+          {user && userRole.isUser && (
             <Link
-              href={userRole.isAdmin ? '/AdminController' : '/Owner'}
+              href="/Profile"
               className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-xl px-4 py-2.5 transition-all duration-200 shadow-lg hover:shadow-purple-500/25 focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
-              <span className="text-sm font-medium text-white">
-                < SettingsIcon className='w-4 h-4'/>
-              </span>
+              <UserCog className="w-5 h-5" />
             </Link>
           )}
 
-          
+          {userRole.hasSpecialAccess && (
+            <Link
+              href={userRole.isAdmin ? "/AdminController" : "/Owner"}
+              className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 rounded-xl px-4 py-2.5 transition-all duration-200 shadow-lg hover:shadow-purple-500/25 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              <span className="text-sm font-medium text-white">
+                <SettingsIcon className="w-4 h-4" />
+              </span>
+            </Link>
+          )}
 
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -308,7 +316,6 @@ export default function Header() {
             aria-label="تسجيل الخروج"
           >
             <LogOut className="w-4 h-4" />
-           
           </motion.button>
         </div>
       );

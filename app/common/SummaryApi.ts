@@ -1,6 +1,6 @@
 "use client";
 
-import { param } from "framer-motion/m";
+
 
 export const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -28,6 +28,10 @@ const SummaryApi = {
     refreshToken: {
       method: "POST",
       url: `${baseURL}/api/users/refresh-token`,
+    },
+    authme:{
+      method:"get",
+      url: `${baseURL}/api/users/auth/me`
     },
 
     // get user by ID
@@ -179,7 +183,107 @@ const SummaryApi = {
     method: "DELETE",
     url: `${baseURL}/api/ads/delete-add/${id}`,
   }),
-  }
+  },
+  blood_req : {
+  // ===== PUBLIC =====
+  getAllBloodRequests: {
+    method: "GET",
+    url: `${baseURL}/api/bloodreq/blood-requests`,
+  },
+
+  searchBloodRequests: {
+    method: "GET",
+    url: `${baseURL}/api/bloodreq/blood-requests/search`,
+  },
+
+  bloodRequestsStatistics: {
+    method: "GET",
+    url: `${baseURL}/api/bloodreq/blood-requests/statistics`,
+  },
+
+  getBloodRequestById: (id: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/bloodreq/blood-requests/${id}`,
+  }),
+
+  matchDonors: (id: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/bloodreq/blood-requests/${id}/match-donors`,
+  }),
+
+  // ===== AUTHENTICATED =====
+  createBloodRequest: {
+    method: "POST",
+    url: `${baseURL}/api/bloodreq/blood-requests`,
+  },
+
+  getMyBloodRequests: {
+    method: "GET",
+    url: `${baseURL}/api/bloodreq/my/blood-requests`,
+  },
+
+  // ===== OWNER =====
+  updateBloodRequest: (id: number | string) => ({
+    method: "PUT",
+    url: `${baseURL}/api/bloodreq/blood-requests/${id}`,
+  }),
+
+  deleteBloodRequest: (id: number | string) => ({
+    method: "DELETE",
+    url: `${baseURL}/api/bloodreq/blood-requests/${id}`,
+  }),
+
+  // ===== ADMIN =====
+  updateBloodRequestStatus: (id: number | string) => ({
+    method: "PUT",
+    url: `${baseURL}/api/bloodreq/blood-requests/${id}/status`,
+  })
+},
+ bloodDonors :{
+  // ===== PUBLIC =====
+  searchDonors: {
+    method: "GET",
+    url: `${baseURL}/api/blooddon/blood-donors/search`,
+  },
+
+  donorStatistics: {
+    method: "GET",
+    url: `${baseURL}/api/blooddon/blood-donors/statistics`,
+  },
+
+  // ===== AUTHENTICATED =====
+  registerDonor: {
+    method: "POST",
+    url: `${baseURL}/api/blooddon/blood-donors/register`,
+  },
+
+  getMyDonorProfile: {
+    method: "GET",
+    url: `${baseURL}/api/blooddon/blood-donors/my-profile`,
+  },
+
+  updateDonorStatus: {
+    method: "PUT",
+    url: `${baseURL}/api/blooddon/blood-donors/status`,
+  },
+   updateDonorProfile: {
+    url: "/api/blooddon/blood-donors/update-profile",
+    method: "PUT"
+  },
+
+  updateLastDonation: {
+    method: "PUT",
+    url: `${baseURL}/api/blooddon/blood-donors/last-donation`,
+  },
+
+  // ===== ADMIN =====
+  getAllDonors: {
+    method: "GET",
+    url: `${baseURL}/api/blooddon/blood-donors`,
+  },
+}
+
+
 };
 
 export default SummaryApi;

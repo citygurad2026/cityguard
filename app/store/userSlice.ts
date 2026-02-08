@@ -20,19 +20,9 @@ export interface UserState {
 }
 
 
-const loadUserFromStorage=()=>{
-  if(typeof window === 'undefined') return null
-  try{
-    const userStr=localStorage.getItem('user')
-    if(userStr){
-      return JSON.parse(userStr) 
-    }
-  }catch (error) {
-    console.error('Error loading user from localStorage:', error);
-  }
-}
+
 const initialState: UserState = {
-  user: loadUserFromStorage(),
+  user:null,
   loading: false,
   error: null,
 };

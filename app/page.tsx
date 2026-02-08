@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "./store/userSlice";
+import { setCredentials,clearSession } from "./store/userSlice";
 import { RootState } from "./store/store";
 import { motion } from 'framer-motion';
 import Head from "next/head";
@@ -11,20 +11,34 @@ import HeroSection from "./component/HeroSection";
 import Statistics from "./component/Statistics";
 import Features from "./component/Features";
 import Header from './component/Header';
+import Axios from "./utilts/Axios";
+import SummaryApi from "./common/SummaryApi";
 
 export default function Home() {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user.user);
 
-  // إعادة تحميل بيانات المستخدم من localStorage
+
   useEffect(() => {
-    if (!user) {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        dispatch(setUser(JSON.parse(storedUser)));
-      }
+  const checkSession = async () => {
+    try {
+      const response = await Axios({
+        ...SummaryApi.user.authme
+      })
+
+      // إذا وصلنا هنا → الجلسة صحيحة
+      dispatch(setCredentials({ user: response.data.user }));
+    } catch (error) {
+      // إذا فشل → الجلسة منتهية
+      dispatch(clearSession());
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     }
-  }, [user, dispatch]);
+  };
+
+  checkSession();
+}, [dispatch]);
 
   return (
     <>

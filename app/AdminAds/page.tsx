@@ -111,11 +111,9 @@ useEffect(() => {
           ...(searchQuery && { search: searchQuery })
         }
       });
-      
-      if (res.data && res.data.ads) {
         setAdsData(res.data.ads);
         updateStats(res.data.ads);
-      }
+     
     } catch (err) {
       console.error("Error fetching ads:", err);
       toast.error("فشل في جلب الإعلانات");

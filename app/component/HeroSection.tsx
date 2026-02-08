@@ -1,3 +1,4 @@
+"use client"
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
@@ -23,8 +24,8 @@ export default function HeroWithBanner() {
   const [currentBanner, setCurrentBanner] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
-
+  const [imageLoaded, setImageLoaded] = useState(true);
+    const current = banners[currentBanner] ?? null
   // جلب البيانات من API
   useEffect(() => {
     const fetchBanners = async () => {
@@ -45,31 +46,20 @@ export default function HeroWithBanner() {
     fetchBanners();
   }, []);
 
-  // تحميل الصور مسبقًا
-  useEffect(() => {
-    if (banners.length === 0) return;
+  
 
-    const preloadImages = () => {
-      banners.forEach(banner => {
-        const img = new Image();
-        img.src = banner.imageUrl;
-        img.onload = () => setImageLoaded(true);
-      });
-    };
 
-    preloadImages();
-  }, [banners]);
+useEffect(() => {
+  if (banners.length <= 1 || isHovered) return;
 
-  // التبديل التلقائي مع إيقاف عند التمرير
-  useEffect(() => {
-    if (banners.length <= 1 || isHovered) return;
+  const interval = setInterval(() => {
+    setCurrentBanner(prev => (prev + 1) % banners.length);
+  }, 6000);
 
-    const interval = setInterval(() => {
-      setCurrentBanner((prev) => (prev + 1) % banners.length);
-    }, 6000);
+  return () => clearInterval(interval);
+}, [banners.length, isHovered]);
 
-    return () => clearInterval(interval);
-  }, [banners.length, isHovered]);
+
 
   const nextBanner = useCallback(() => {
     setCurrentBanner((prev) => (prev + 1) % banners.length);
@@ -116,7 +106,7 @@ export default function HeroWithBanner() {
     );
   }
 
-  const current = banners[currentBanner];
+
 
   return (
     <section 

@@ -182,62 +182,66 @@ const initialImages = {
   };
 
   // إرسال النموذج
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+   const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!formData.title || !formData.startAt || !formData.endAt) {
-      toast.error("يرجى ملء الحقول الإلزامية (*)");
-      return;
+  if (!formData.title || !formData.startAt || !formData.endAt) {
+    toast.error("يرجى ملء الحقول الإلزامية (*)");
+    return;
+  }
+
+  if (new Date(formData.endAt) <= new Date(formData.startAt)) {
+    toast.error("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء");
+    return;
+  }
+
+  if (!images.image) {
+    toast.error("يرجى تحميل صورة رئيسية للإعلان");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("title", formData.title);
+    formDataToSend.append("content", formData.content || "");
+    formDataToSend.append("bannerType", formData.bannerType); // MAIN_HERO
+    formDataToSend.append("targetType", formData.targetType); // EXTERNAL أو BUSINESS
+    formDataToSend.append("url", formData.url || "");
+    formDataToSend.append("startAt", new Date(formData.startAt).toISOString());
+    formDataToSend.append("endAt", new Date(formData.endAt).toISOString());
+
+    // أرسل targetId فقط إذا الإعلان خاص بالمالك
+    if (formData.targetType === "BUSINESS") {
+      formDataToSend.append("targetId", formData.targetId.toString());
     }
 
-    if (new Date(formData.endAt) <= new Date(formData.startAt)) {
-      toast.error("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء");
-      return;
+    if (images.image) formDataToSend.append("image", images.image);
+    if (images.mobileImage) formDataToSend.append("mobileImage", images.mobileImage);
+    if (images.tabletImage) formDataToSend.append("tabletImage", images.tabletImage);
+
+    const res = await Axios({
+      ...SummaryApi.ad.create_ad,
+      data: formDataToSend,
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.data.ad) {
+      toast.success("تم إنشاء الإعلان بنجاح وتم إرساله للمراجعة");
+      setFormData(initialFormData);
+      setImages(initialImages);
+      router.push("/AdminAds");
+    } else {
+      toast.error(res.data.message || "حدث خطأ أثناء إنشاء الإعلان");
     }
-
-    if (!images.image) {
-      toast.error("يرجى تحميل صورة رئيسية للإعلان");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const formDataToSend = new FormData();
-
-      // إضافة البيانات النصية
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value) formDataToSend.append(key, value);
-      });
-
-      // إضافة الصور
-      if (images.image) formDataToSend.append("image", images.image);
-      if (images.mobileImage) formDataToSend.append("mobileImage", images.mobileImage);
-      if (images.tabletImage) formDataToSend.append("tabletImage", images.tabletImage);
-
-      const res = await Axios({
-        ...SummaryApi.ad.create_ad,
-        data: formDataToSend,
-        headers: {
-          Authorization: `Bearer ${token}`, 
-        },
-      });
-
-      if (res.data.ok) {
-        toast.success("تم إنشاء الإعلان بنجاح وتم إرساله للمراجعة");
-        setFormData(initialFormData)
-        setImages(initialImages)
-        router.push("/AdminAds");
-      } else {
-        toast.error(res.data.message || "حدث خطأ أثناء إنشاء الإعلان");
-      }
-    } catch (err: any) {
-      console.error("Create ad error:", err);
-      toast.error(err.response?.data?.message || "فشل في إنشاء الإعلان");
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err: any) {
+    console.error("Create ad error:", err);
+    toast.error(err.response?.data?.message || "فشل في إنشاء الإعلان");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div
       className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6 font-cairo"

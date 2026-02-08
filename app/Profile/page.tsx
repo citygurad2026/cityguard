@@ -1,11 +1,10 @@
 "use client";
-import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import Axios from "../utilts/Axios";
 import { useSelector } from "react-redux";
-import { RootState ,} from "../store/store";
+import { RootState } from "../store/store";
 import SummaryApi from "../common/SummaryApi";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   User, 
   Phone, 
@@ -15,17 +14,23 @@ import {
   Bell, 
   Calendar,
   Edit3,
-  Settings,
-  LogOut,
   Star,
-  MapPin
+  ChevronRight,
+  Crown,
+  Mail,
+  Droplet,
+  Target,
+  History,
+  BarChart,
+  Settings,
+  ArrowRight,
+  ShieldCheck,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import EditProfilePage from "../UserProfileEdit/page";
+import toast from "react-hot-toast";
 import Link from "next/link";
 
-import toast from "react-hot-toast";
 type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 interface Review {
@@ -58,17 +63,49 @@ interface UserData {
   lastLogin?: string;
   bio?: string;
   createdAt: string;
-  reviews?: Review[];
-  favorites?: { business: { id: number; name: string; slug: string } }[];
-  bookmarks?: { business: { id: number; name: string; slug: string } }[];
-  notifications?: { id: number; title: string; message: string; isRead: boolean; sentAt: string }[];
+  city?: string;
+
+  reviews?: Review[]; // ✅ الحل هنا
+
+  _count?: {
+    reviews: number;
+    favorites: number;
+    bookmarks: number;
+    sentMessages?: number;
+  };
+
+  favorites?: {
+    business: {
+      id: number;
+      name: string;
+      slug: string;
+      category?: string;
+    };
+  }[];
+
+  notifications?: {
+    id: number;
+    title: string;
+    message: string;
+    isRead: boolean;
+    sentAt: string;
+  }[];
+
+  isDonor?: boolean;
+  donorInfo?: {
+    bloodType?: string;
+    totalDonations?: number;
+    lastDonation?: string;
+    isAvailable?: boolean;
+  };
 }
+
 
 interface StoreUser {
   id: number;
   name?: string;
   username: string;
-  role: "USER";
+  role: "USER" | "ADMIN";
   accessToken: string;
 }
 
@@ -76,75 +113,119 @@ export default function ProfilePage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
-   const router = useRouter()
-
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-         if (!user ) {
-        toast.error("يرجى تسجيل الدخول أولاً");
-         setLoading(false);
-         return
-         }
+        if (!user) {
+          toast.error("يرجى تسجيل الدخول أولاً");
+          setLoading(false);
+          return;
+        }
+        
         const response = await Axios({
           ...SummaryApi.user.getUserById(user.id),
           headers: { Authorization: `Bearer ${user.accessToken}` },
         });
 
-        setUserData(response.data.data);
-      
-    }catch (err: any) {
+        const data = response.data.data;
+        
+        // جلب معلومات المتبرع إذا كان متبرعاً
+        let donorInfo = null;
+        if (user.role === "USER") {
+          try {
+            const donorRes = await Axios({
+              ...SummaryApi.bloodDonors.getMyDonorProfile,
+              headers: { Authorization: `Bearer ${user.accessToken}` },
+            });
+            
+            if (donorRes.data.success) {
+              donorInfo = {
+                bloodType: donorRes.data.data.bloodType,
+                totalDonations: donorRes.data.data.totalDonations || 0,
+                lastDonation: donorRes.data.data.lastDonation,
+                isAvailable: donorRes.data.data.isAvailable
+              };
+            }
+          } catch (error) {
+            // المستخدم ليس متبرعاً بعد
+            console.log("User is not a donor yet");
+          }
+        }
+
+        setUserData({
+          ...data,
+          isDonor: !!donorInfo,
+          donorInfo
+        });
+        
+      } catch (err: any) {
         console.error("Error fetching user data:", err.response?.data || err.message);
+        toast.error("حدث خطأ في تحميل البيانات");
       } finally {
         setLoading(false);
-      }}
+      }
+    };
 
     fetchUserData();
-  }, [user, router]);
+  }, [user]);
+
+ const stats = [
+  {
+    label: "المفضلات",
+    value: userData?._count?.favorites || 0,
+    icon: Heart,
+    gradient: "from-red-500 to-pink-600",
+    description: "الأعمال المفضلة لديك",
+  },
+  {
+    label: "المحفوظات",
+    value: userData?._count?.bookmarks || 0,
+    icon: Bookmark,
+    gradient: "from-blue-500 to-cyan-600",
+    description: "الأعمال المحفوظة",
+  },
+  {
+    label: "الإشعارات",
+    value: userData?.notifications?.filter(n => !n.isRead).length || 0,
+    icon: Bell,
+    gradient: "from-green-500 to-emerald-600",
+    description: "إشعارات غير مقروءة",
+  },
+  {
+    label: "التقييمات",
+    value: userData?._count?.reviews || 0,
+    icon: Star,
+    gradient: "from-yellow-500 to-amber-600",
+    description: "التقييمات المقدمة",
+  },
+];
 
 
-
-
-
-  const stats = [
+  const quickActions = [
     {
-      label: "المفضلات",
-      value: userData?.favorites?.length || 0,
-      icon: Heart,
-      color: "red",
-      description: "الأعمال المفضلة لديك"
+      title: "تعديل الملف",
+      description: "عدل معلوماتك الشخصية",
+      icon: Edit3,
+      color: "from-blue-500 to-blue-600",
+      href: "/UserProfileEdit"
     },
-    {
-      label: "العلامات المرجعية",
-      value: userData?.bookmarks?.length || 0,
-      icon: Bookmark,
-      color: "blue",
-      description: "الأعمال المحفوظة"
-    },
-    {
-      label: "الإشعارات",
-      value: userData?.notifications?.length || 0,
-      icon: Bell,
-      color: "green",
-      description: "الإشعارات غير المقروءة"
-    },
-    {
-      label: "التقييمات",
-      value: userData?.reviews?.length || 0, // إذا كان لديك حقل التقييمات
-      icon: Star,
-      color: "yellow",
-      description: "التقييمات المقدمة"
-    }
   ];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg font-cairo">جاري تحميل الملف الشخصي...</p>
+          <div className="relative">
+            <div className="w-24 h-24 border-4 border-red-100 border-t-red-600 rounded-full animate-spin mx-auto" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-10 h-10 bg-red-600 rounded-full animate-pulse" />
+            </div>
+          </div>
+          <h3 className="mt-6 text-xl font-bold text-gray-800">جاري تحميل بياناتك الشخصية</h3>
+          <p className="text-gray-600 mt-2">نحضر لك أحدث المعلومات والإحصائيات...</p>
         </div>
       </div>
     );
@@ -152,16 +233,16 @@ export default function ProfilePage() {
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <User className="w-8 h-8 text-red-500" />
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <User className="w-10 h-10 text-red-600" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">لم يتم العثور على البيانات</h3>
-          <p className="text-gray-600 mb-6">يرجى تسجيل الدخول مرة أخرى</p>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">عذراً!</h3>
+          <p className="text-gray-600 mb-6">لم نتمكن من تحميل بيانات حسابك</p>
           <button
             onClick={() => router.push("/Login")}
-            className="px-6 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+            className="bg-gradient-to-r from-red-600 to-red-700 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg hover:from-red-700 hover:to-red-800 transition shadow-lg"
           >
             تسجيل الدخول
           </button>
@@ -171,351 +252,408 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
-      <div
-        className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 font-cairo"
-        dir="rtl"
-      >
-        <div className="max-w-4xl mx-auto p-6">
-          {/* Header Section */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-2">
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-emerald-700 bg-clip-text text-transparent">
-                  الملف الشخصي
-                </h1>
-                <p className="text-gray-600 mt-2">مرحباً بك في صفحتك الشخصية</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir="rtl">
+      
+      {/* Hero Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="container mx-auto px-4 py-12 relative">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="text-center md:text-right">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <Crown className="w-8 h-8" />
+                </div>
+                <div>
+                  <h1 className="text-4xl md:text-5xl font-bold">ملفك الشخصي 👑</h1>
+                  <p className="text-gray-300 text-lg mt-2">كل معلوماتك في مكان واحد</p>
+                </div>
               </div>
-              <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => router.push("/")}
-            className=" text-green-700 hover:text-gray-600 transition-colors duration-300 mt-2"
-          >
-            العودة للصفحة الرئيسية
-          </motion.button>
+              
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                <button
+                  onClick={() => router.push("/")}
+                  className="flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-xl hover:bg-white/30 transition border border-white/30"
+                >
+                  <ArrowRight className="w-5 h-5 rotate-180" />
+                  العودة للرئيسية
+                </button>
+                
+                <Link
+                  href="/UserProfileEdit"
+                  className="flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition font-bold"
+                >
+                  <Edit3 className="w-5 h-5" />
+                  تعديل الملف
+                </Link>
+              </div>
             </div>
-            
-          </motion.div>
-          
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Profile Sidebar */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-1"
-            >
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-6">
-                {/* User Avatar and Info */}
-                <div className="text-center mb-6">
-                  {userData.avatarUrl ? (
-                    <Image
-                      src={userData.avatarUrl}
-                      alt="avatar"
-                      fill
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-4">
-                      {userData.name?.charAt(0) || userData.username?.charAt(0)}
-                    </div>
-                  )}
-                  <h2 className="text-lg font-bold text-gray-900">
-                    {userData.name || userData.username}
-                  </h2>
-                  <p className="text-gray-500 text-sm">@{userData.username}</p>
-                  {userData.bio && (
-                    <p className="text-gray-600 mt-2 text-sm">{userData.bio}</p>
-                  )}
-                </div>
-
-                {/* Account Info */}
-                <div className="space-y-3 text-sm text-gray-600 border-t pt-4">
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    <span>{userData.phone || "لم يتم إضافة رقم هاتف"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4" />
-                    <span>{userData.isActive ? "نشط" : "غير نشط"}</span>
-                  </div>
-                  {userData.lastLogin && (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>
-                        آخر تسجيل دخول{" "}
-                        {new Date(userData.lastLogin).toLocaleDateString(
-                          "ar-SA"
-                        )}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>
-                      منضم منذ{" "}
-                      {new Date(userData.createdAt).toLocaleDateString("ar-SA")}
-                    </span>
-                  </div>
-                </div>
-
-                {/* User Stats */}
-                <div className="space-y-3 mb-6">
-                  {stats.map((stat, index) => (
-                    <motion.div
-                      key={stat.label}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 bg-${stat.color}-100 rounded-lg`}>
-                          <stat.icon
-                            className={`w-4 h-4 text-${stat.color}-600`}
-                          />
-                        </div>
-                        <div>
-                          <span className="text-sm text-gray-700 block">
-                            {stat.label}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {stat.description}
-                          </span>
-                        </div>
+            <div className="relative">
+              <div className="w-48 h-48 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <div className="w-40 h-40 bg-white/20 rounded-full flex items-center justify-center">
+                  <div className="w-32 h-32 bg-white/30 rounded-full flex items-center justify-center border-4 border-white">
+                    {userData.avatarUrl ? (
+                      <Image
+                        src={userData.avatarUrl}
+                        alt={userData.name || userData.username}
+                        width={128}
+                        height={128}
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-28 h-28 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+                        {userData.name?.charAt(0) || userData.username?.charAt(0)}
                       </div>
-                      <span className="font-bold text-gray-900 text-lg">
-                        {stat.value}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Account Info */}
-                <div className="space-y-3 text-sm text-gray-600 border-t pt-4">
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    <span>{userData.phone || "لم يتم إضافة رقم هاتف"}</span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4" />
-                    <span>مستخدم عادي</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span>
-                      منضم منذ{" "}
-                      {new Date(userData.createdAt).toLocaleDateString("ar-SA")}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="mt-6 space-y-3">
-                  {/* زر تعديل الملف الشخصي */}
-                  <Link
-                    href="/UserProfileEdit"
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                    تعديل الملف الشخصي
-                  </Link>
                 </div>
               </div>
-            </motion.div>
-
-            {/* Main Content */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="lg:col-span-2"
-            >
-              {/* Favorites Section */}
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                    <Heart className="w-5 h-5 text-red-500" />
-                    الأعمال المفضلة
-                  </h3>
-                  <span className="text-sm text-gray-500">
-                    {userData.favorites?.length || 0} عمل
-                  </span>
-                </div>
-
-                {userData.favorites?.length ? (
-                  <div className="space-y-3">
-                    {userData.favorites.slice(0, 5).map((favorite, index) => (
-                      <motion.div
-                        key={favorite.business.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                            {favorite.business.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {favorite.business.name}
-                            </p>
-                            <p className="text-sm text-gray-500">عمل مفضل</p>
-                          </div>
-                        </div>
-                        <button className="text-red-500 hover:text-red-600 transition-colors">
-                          <Heart className="w-5 h-5 fill-current" />
-                        </button>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Heart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">لا توجد أعمال مفضلة</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      يمكنك إضافة أعمال إلى المفضلة من خلال تصفح الأعمال
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Bookmarks Section */}
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                    <Bookmark className="w-5 h-5 text-blue-500" />
-                    العلامات المرجعية
-                  </h3>
-                  <span className="text-sm text-gray-500">
-                    {userData.bookmarks?.length || 0} محفوظ
-                  </span>
-                </div>
-
-                {userData.bookmarks?.length ? (
-                  <div className="space-y-3">
-                    {userData.bookmarks.slice(0, 5).map((bookmark, index) => (
-                      <motion.div
-                        key={bookmark.business.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                            {bookmark.business.name.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {bookmark.business.name}
-                            </p>
-                            <p className="text-sm text-gray-500">محفوظ</p>
-                          </div>
-                        </div>
-                        <button className="text-blue-500 hover:text-blue-600 transition-colors">
-                          <Bookmark className="w-5 h-5 fill-current" />
-                        </button>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Bookmark className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">لا توجد علامات مرجعية</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      احفظ الأعمال المهمة لك للرجوع إليها لاحقاً
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Recent Notifications */}
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                    <Bell className="w-5 h-5 text-green-500" />
-                    آخر الإشعارات
-                  </h3>
-                  <span className="text-sm text-gray-500">
-                    {userData.notifications?.length || 0} إشعار
-                  </span>
-                </div>
-
-                {userData.notifications?.length ? (
-                  <div className="space-y-3">
-                    {userData.notifications
-                      .slice(0, 3)
-                      .map((notification, index) => (
-                        <motion.div
-                          key={notification.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className={`p-3 rounded-xl border ${
-                            notification.isRead
-                              ? "bg-gray-50 border-gray-200"
-                              : "bg-blue-50 border-blue-200"
-                          }`}
-                        >
-                          <p className="font-medium text-gray-900">
-                            {notification.title}
-                          </p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-gray-400 mt-2">
-                            {new Date(notification.sentAt).toLocaleDateString(
-                              "ar-SA"
-                            )}
-                          </p>
-                        </motion.div>
-                      ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">لا توجد إشعارات</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      سيظهر هنا آخر الإشعارات والنشاطات
-                    </p>
-                  </div>
-                )}
-              </div>
-              {userData.reviews && userData.reviews.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-lg border p-6 mt-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Star className="w-5 h-5 text-yellow-500" /> تقييماتك
-                  </h3>
-                  <div className="space-y-3">
-                    {userData.reviews.map((review) => (
-                      <div
-                        key={review.id}
-                        className="p-3 rounded-xl bg-gray-50 border border-gray-200"
-                      >
-                        <p className="font-medium text-gray-900">
-                          {review.business?.name || "-"}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {review.comment}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          التقييم: {review.rating} ⭐
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
-    </>
+
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 -mt-8">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition transform hover:-translate-y-1"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="text-2xl">✨</div>
+                  </div>
+                  <div className={`w-12 h-12 bg-gradient-to-r ${stat.gradient} rounded-xl flex items-center justify-center`}>
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-gray-800 mb-2">{stat.value}</div>
+                <div className="text-lg font-medium text-gray-700 mb-1">{stat.label}</div>
+                <div className="text-sm text-gray-500">{stat.description}</div>
+                <div className="mt-4 h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full bg-gradient-to-r ${stat.gradient} rounded-full`} style={{ width: '100%' }} />
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Profile Sidebar */}
+          <div className="space-y-8">
+
+            {/* Profile Info Card */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-3">معلومات الحساب 🪪</h2>
+                <p className="text-gray-600">تفاصيل حسابك الشخصية</p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <User className="w-6 h-6 text-blue-600" />
+                    <p className="font-medium text-gray-800">الاسم</p>
+                  </div>
+                  <p className="font-bold text-gray-800 text-lg">{userData.name || userData.username}</p>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Phone className="w-6 h-6 text-purple-600" />
+                    <p className="font-medium text-gray-800">رقم الهاتف</p>
+                  </div>
+                  <p className="font-bold text-gray-800 text-lg" dir="ltr">
+                    {userData.phone || "غير متوفر"}
+                  </p>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <ShieldCheck className="w-6 h-6 text-orange-600" />
+                    <p className="font-medium text-gray-800">حالة الحساب</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="font-bold text-gray-800">{userData.isActive ? "نشط" : "غير نشط"}</p>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      userData.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                    }`}>
+                      {userData.isActive ? "🟢" : "⚪"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Calendar className="w-6 h-6 text-gray-600" />
+                    <p className="font-medium text-gray-800">تاريخ الانضمام</p>
+                  </div>
+                  <p className="font-bold text-gray-800">
+                    {new Date(userData.createdAt).toLocaleDateString('ar-SA', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Blood Donation Section */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-red-100 to-red-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-8 h-8 text-red-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">التبرع بالدم ❤️</h2>
+                <p className="text-gray-600">انضم إلى مجتمع المنقذين</p>
+              </div>
+
+              {userData.isDonor ? (
+                <div className="space-y-6">
+                  <div className="p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-xl border border-red-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-gray-800">فصيلة الدم</p>
+                        <p className="text-sm text-gray-600">فصيلة دمك المنقذة</p>
+                      </div>
+                      <div className={`px-4 py-2 rounded-lg text-white font-bold ${userData.donorInfo?.bloodType ? 
+                        "bg-gradient-to-r from-red-500 to-red-600" : 
+                        "bg-gradient-to-r from-gray-500 to-gray-600"}`}>
+                        {userData.donorInfo?.bloodType || "غير محدد"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border border-green-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-gray-800">عدد التبرعات</p>
+                        <p className="text-sm text-gray-600">أرواح أنقذتها</p>
+                      </div>
+                      <div className="text-2xl font-bold text-green-600">
+                        {userData.donorInfo?.totalDonations || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/BloodDonorProfile"
+                    className="block w-full py-3.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-center hover:shadow-lg hover:from-red-700 hover:to-red-800 transition shadow-lg"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <Droplet className="w-5 h-5" />
+                      الذهاب لملف المتبرع
+                    </div>
+                  </Link>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Target className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-800 mb-2">لم تسجل بعد كمتبرع</h3>
+                  <p className="text-gray-600 mb-6">انضم إلى مجتمع الأبطال المنقذين للحياة</p>
+                  <Link
+                    href="/BloodDonorRegister"
+                    className="block w-full py-3.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl font-bold hover:shadow-lg hover:from-green-700 hover:to-green-800 transition shadow-lg"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <Shield className="w-5 h-5" />
+                      التسجيل كمتبرع
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+           
+            {/* Favorites Section */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">الأعمال المفضلة ⭐</h3>
+                  <p className="text-gray-600">الأعمال التي أضفتها إلى المفضلة</p>
+                </div>
+                <span className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-bold">
+                 {userData._count?.favorites || 0} عمل
+                </span>
+              </div>
+
+              {userData.favorites?.length ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {userData.favorites.slice(0, 4).map((favorite, index) => (
+                    <motion.div
+                      key={favorite.business.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="p-4 border border-gray-200 rounded-xl hover:shadow-lg hover:border-gray-300 transition"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">
+                              {favorite.business.name.charAt(0)}
+                            </span>
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-800">{favorite.business.name}</h4>
+                            <p className="text-sm text-gray-500">{favorite.business.category || "عام"}</p>
+                          </div>
+                        </div>
+                        <button className="text-red-500 hover:text-red-600">
+                          <Heart className="w-5 h-5 fill-current" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Star className="w-12 h-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-3">لا توجد أعمال مفضلة</h3>
+                  <p className="text-gray-600 mb-8">يمكنك إضافة أعمال إلى المفضلة من خلال تصفح الأعمال</p>
+                  <button
+                    onClick={() => router.push("/Businesses")}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition"
+                  >
+                    تصفح الأعمال
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Recent Notifications */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">آخر الإشعارات 🔔</h3>
+                  <p className="text-gray-600">آخر نشاطاتك وتحديثات النظام</p>
+                </div>
+                <span className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full font-bold">
+                  {userData.notifications?.filter(n => !n.isRead).length || 0} غير مقروء
+                </span>
+              </div>
+
+              {userData.notifications?.length ? (
+                <div className="space-y-4">
+                  {userData.notifications.slice(0, 3).map((notification, index) => (
+                    <motion.div
+                      key={notification.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className={`p-4 rounded-xl border ${
+                        notification.isRead
+                          ? "bg-gray-50 border-gray-200"
+                          : "bg-blue-50 border-blue-200"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            {!notification.isRead && (
+                              <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                            )}
+                            <h4 className="font-bold text-gray-800">{notification.title}</h4>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-2">{notification.message}</p>
+                          <p className="text-xs text-gray-400">
+                            {new Date(notification.sentAt).toLocaleDateString('ar-SA', {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
+                        {!notification.isRead && (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                            جديد
+                          </span>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Bell className="w-12 h-12 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-3">لا توجد إشعارات</h3>
+                  <p className="text-gray-600">ستظهر هنا آخر الإشعارات والنشاطات</p>
+                </div>
+              )}
+            </div>
+
+            {/* Reviews Section */}
+            {userData.reviews && userData.reviews.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-2">آخر تقييماتك ⭐</h3>
+                    <p className="text-gray-600">التقييمات التي قدمتها للأعمال</p>
+                  </div>
+                  <span className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-full font-bold">
+                    {userData.reviews.length} تقييم
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {userData.reviews.slice(0, 2).map((review) => (
+                    <div key={review.id} className="p-4 border border-gray-200 rounded-xl">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 className="font-bold text-gray-800">{review.business?.name || "عمل غير محدد"}</h4>
+                          <div className="flex items-center gap-1 mt-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${i < review.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          review.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
+                          review.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {review.status === 'APPROVED' ? 'معتمد' :
+                           review.status === 'REJECTED' ? 'مرفوض' : 'قيد المراجعة'}
+                        </span>
+                      </div>
+                      {review.comment && (
+                        <p className="text-gray-600 text-sm mb-3">{review.comment}</p>
+                      )}
+                      <div className="flex items-center justify-between text-xs text-gray-400">
+                        <span>{new Date(review.createdAt).toLocaleDateString('ar-SA')}</span>
+                        <span>👍 {review.helpful} مفيد</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
