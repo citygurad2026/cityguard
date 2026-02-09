@@ -1,8 +1,8 @@
 "use client";
-export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Axios from "../utilts/Axios";
 import SummaryApi from "../common/SummaryApi";
 
@@ -55,7 +55,12 @@ type BloodType =
 
 export default function BloodDonorsListPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+const [filters, setFilters] = useState({
+  bloodType: "",
+  city: "",
+  availableOnly: true,
+  search: "",
+});
 
   /* ===== STATE ===== */
 
@@ -63,14 +68,6 @@ export default function BloodDonorsListPage() {
   const [stats, setStats] = useState<BloodDonorStatistics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [filters, setFilters] = useState({
-    bloodType: searchParams.get("bloodType") || "",
-    city: searchParams.get("city") || "",
-    availableOnly: searchParams.get("available") !== "false",
-    search: searchParams.get("search") || "",
-  });
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
@@ -206,6 +203,17 @@ useEffect(() => {
     if (monthsDiff >= 4) return { text: "قريباً جاهز", color: "text-yellow-600", bg: "bg-yellow-100" };
     return { text: "تم التبرع مؤخراً", color: "text-blue-600", bg: "bg-blue-100" };
   };
+  useEffect(() => {
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    setFilters({
+      bloodType: params.get("bloodType") || "",
+      city: params.get("city") || "",
+      availableOnly: params.get("available") !== "false",
+      search: params.get("search") || "",
+    });
+  }
+}, []);
 
   /* ================= LOADING & ERROR ================= */
 
