@@ -34,6 +34,15 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+type BloodType =
+  | "A+"
+  | "A-"
+  | "B+"
+  | "B-"
+  | "O+"
+  | "O-"
+  | "AB+"
+  | "AB-";
 // --- Schema validation using Zod ---
 const bloodSchema = z.object({
   bloodType: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
@@ -90,7 +99,7 @@ export default function BloodRequestCreate() {
     resolver: zodResolver(bloodSchema),
     mode: "onChange",
     defaultValues: {
-      bloodType: "",
+      bloodType: undefined,
       units: 1,
       urgency: "normal",
       city: "",
@@ -129,11 +138,6 @@ export default function BloodRequestCreate() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const storedToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
- 
-  }, []);
 
   const handleNext = () => {
     const stepFields: Record<number, (keyof BloodFormData)[]> = {

@@ -26,6 +26,7 @@ interface BloodRequest {
 }
 
 interface BloodRequestStatistics {
+  
   totalRequests: number;
   openRequests: number;
   fulfilledRequests: number;
@@ -251,7 +252,7 @@ useEffect(() => {
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center md:text-right">
                   <div className="text-4xl font-bold text-red-600 mb-2">
-                    {stats.livesSaved || 1247}
+                    {1247}
                   </div>
                   <div className="text-gray-700 font-medium">
                     حياة تم إنقاذها

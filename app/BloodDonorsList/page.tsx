@@ -40,6 +40,16 @@ interface BloodDonorStatistics {
   recentDonors: number;
   activationRate: number;
 }
+type BloodType =
+  | "A+"
+  | "A-"
+  | "B+"
+  | "B-"
+  | "O+"
+  | "O-"
+  | "AB+"
+  | "AB-";
+
 
 /* ================= PAGE ================= */
 
@@ -170,19 +180,21 @@ useEffect(() => {
     return colors[bloodType] || "bg-gray-600 text-white";
   };
 
-  const getCompatibilityChart = (bloodType: string) => {
-    const chartData = {
-      "A+": ["A+", "A-", "O+", "O-"],
-      "A-": ["A-", "O-"],
-      "B+": ["B+", "B-", "O+", "O-"],
-      "B-": ["B-", "O-"],
-      "O+": ["O+", "O-"],
-      "O-": ["O-"],
-      "AB+": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-      "AB-": ["A-", "B-", "AB-", "O-"],
-    };
-    return chartData[bloodType] || [];
+ const getCompatibilityChart = (bloodType: BloodType) => {
+  const chartData: Record<BloodType, string[]> = {
+    "A+": ["A+", "A-", "O+", "O-"],
+    "A-": ["A-", "O-"],
+    "B+": ["B+", "B-", "O+", "O-"],
+    "B-": ["B-", "O-"],
+    "O+": ["O+", "O-"],
+    "O-": ["O-"],
+    "AB+": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+    "AB-": ["A-", "B-", "AB-", "O-"],
   };
+
+  return chartData[bloodType];
+};
+
 
   const getDonorStatus = (lastDonation?: string) => {
     if (!lastDonation) return { text: "جاهز للتبرع", color: "text-green-600", bg: "bg-green-100" };
@@ -573,7 +585,7 @@ useEffect(() => {
                             يمكنه التبرع لـ:
                           </p>
                           <div className="flex flex-wrap gap-2">
-                            {getCompatibilityChart(donor.bloodType).map(
+                            {getCompatibilityChart(donor.bloodType as BloodType).map(
                               (type) => (
                                 <span
                                   key={type}
