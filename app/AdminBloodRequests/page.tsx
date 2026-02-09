@@ -171,7 +171,7 @@ export default function AdminBloodRequests() {
     }).length,
   };
 
-  if (!user || user.role !== "ADMIN") {
+  if (!user || user.role !== "admin") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-gray-100">
         <div className="text-center p-8">

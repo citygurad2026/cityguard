@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Plus, Edit, Trash2, Search, Filter, Layers, 
-  ArrowLeft, CheckCircle, XCircle, Eye 
+  Plus, Edit, Trash2, Search, Layers, 
+  ArrowLeft, CheckCircle, XCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
