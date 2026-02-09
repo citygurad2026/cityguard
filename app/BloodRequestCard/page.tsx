@@ -23,7 +23,7 @@ interface BloodRequestCardProps {
 
 const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
   const router = useRouter();
-
+if (!request) return <div>جاري التحميل ...</div>;
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case 'critical': return 'bg-red-100 text-red-800 border-red-200';
@@ -81,7 +81,7 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
       {/* شريط العنوان */}
       <div
         className={`p-4 border-b ${
-          request.urgency === "critical"
+          request?.urgency === "critical"
             ? "bg-red-50 border-red-100"
             : "bg-gray-50 border-gray-100"
         }`}
@@ -90,12 +90,12 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
           <div className="flex items-center gap-2">
             <div
               className={`p-2 rounded-lg ${
-                request.urgency === "critical" ? "bg-red-100" : "bg-red-50"
+                request?.urgency === "critical" ? "bg-red-100" : "bg-red-50"
               }`}
             >
               <Droplet
                 className={`w-6 h-6 ${
-                  request.urgency === "critical"
+                  request?.urgency === "critical"
                     ? "text-red-600"
                     : "text-red-500"
                 }`}
@@ -103,9 +103,9 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
             </div>
             <div>
               <h3 className="text-xl font-bold text-red-600">
-                {request.bloodType}
+                {request?.bloodType}
               </h3>
-              <p className="text-sm text-gray-600">{request.units} وحدة</p>
+              <p className="text-sm text-gray-600">{request?.units} وحدة</p>
             </div>
           </div>
 
@@ -113,10 +113,10 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
             <span
               className={`px-3 py-1 rounded-full text-xs font-medium border ${getUrgencyColor(request.urgency)}`}
             >
-              {getUrgencyLabel(request.urgency)}
+              {getUrgencyLabel(request?.urgency)}
             </span>
             <span className="px-3 py-1 border border-gray-300 text-gray-700 rounded-full text-xs font-medium">
-              {request.units} وحدة
+              {request?.units} وحدة
             </span>
           </div>
         </div>
@@ -132,7 +132,7 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">المستشفى</p>
-              <p className="font-medium text-gray-900">{request.hospital}</p>
+              <p className="font-medium text-gray-900">{request?.hospital}</p>
             </div>
           </div>
 
@@ -143,7 +143,7 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">الموقع</p>
-              <p className="font-medium text-gray-900">{request.city}</p>
+              <p className="font-medium text-gray-900">{request?.city}</p>
             </div>
           </div>
 
@@ -155,7 +155,7 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
             <div>
               <p className="text-sm text-gray-600 mb-1">جهة الاتصال</p>
               <p className="font-medium text-gray-900" dir="ltr">
-                {request.contactPhone}
+                {request?.contactPhone}
               </p>
             </div>
           </div>
@@ -169,41 +169,41 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
               <p className="text-sm text-gray-600 mb-1">تاريخ النشر</p>
               <div className="flex items-center gap-2">
                 <p className="font-medium text-gray-900">
-                  {formatDate(request.createdAt)}
+                  {formatDate(request?.createdAt)}
                 </p>
                 <span className="text-xs text-gray-500">
-                  ({getTimeAgo(request.createdAt)})
+                  ({getTimeAgo(request?.createdAt)})
                 </span>
               </div>
             </div>
           </div>
 
           {/* الملاحظات */}
-          {request.notes && (
+          {request?.notes && (
             <div>
               <p className="text-sm text-gray-600 mb-2">ملاحظات</p>
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-gray-700 text-sm leading-relaxed">
-                  {request.notes}
+                  {request?.notes}
                 </p>
               </div>
             </div>
           )}
 
           {/* الطالب (إذا كان مسجلاً) */}
-          {request.requester && (
+          {request?.requester && (
             <div className="flex items-center gap-2 pt-3 border-t">
               <User className="w-4 h-4 text-gray-500" />
 
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <span className="text-blue-600 font-bold">
-                    {request.requester.name?.charAt(0)}
+                    {request?.requester.name?.charAt(0)}
                   </span>
                 </div>
 
                 <span className="text-sm text-gray-700">
-                  {request.requester.name}
+                  {request?.requester.name}
                 </span>
               </div>
             </div>
@@ -232,8 +232,8 @@ const BloodRequestCard: React.FC<BloodRequestCardProps> = ({ request }) => {
 
             <button
               onClick={() =>{
-              console.log("requset id",request.id)
-                router.push(`/BloodRequestDetail/${request.id}`)}
+              console.log("requset id",request?.id)
+                router.push(`/BloodRequestDetail/${request?.id}`)}
               }
              
               
