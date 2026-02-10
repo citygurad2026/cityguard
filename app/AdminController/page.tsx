@@ -229,10 +229,21 @@ useEffect(() => {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2">
-              {/* أزرار التمرير */}
-              <div className="flex items-center gap-3 overflow-x-auto scroll-smooth">
-                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+            <div className="flex flex-col gap-2 w-full lg:w-auto">
+              {/* أزرار التمرير - تم التعديل */}
+              <div
+                className="flex gap-3 overflow-x-auto scroll-smooth whitespace-nowrap 
+                    w-full max-w-full pb-2 px-1
+                    [&::-webkit-scrollbar]:h-2
+                    [&::-webkit-scrollbar-track]:bg-gray-100
+                    [&::-webkit-scrollbar-thumb]:bg-gray-400
+                    [&::-webkit-scrollbar-thumb]:rounded-full"
+              >
+                <motion.div
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-shrink-0"
+                >
                   <Link
                     href="/AddUser"
                     className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
@@ -242,7 +253,11 @@ useEffect(() => {
                   </Link>
                 </motion.div>
 
-                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-shrink-0"
+                >
                   <Link
                     href="/AdminCategories"
                     className="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all"
@@ -252,7 +267,11 @@ useEffect(() => {
                   </Link>
                 </motion.div>
 
-                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-shrink-0"
+                >
                   <Link
                     href="/AdminAds"
                     className="flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all"
@@ -262,7 +281,11 @@ useEffect(() => {
                   </Link>
                 </motion.div>
 
-                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                <motion.div
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-shrink-0"
+                >
                   <Link
                     href="/AdminBloodRequests"
                     className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
@@ -278,7 +301,7 @@ useEffect(() => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => router.push("/")}
-                className="mt-2 px-6 py-3 text-gray-700 hover:text-gray-600 transition-colors"
+                className="mt-2 px-6 py-3 text-gray-700 hover:text-gray-600 transition-colors self-start"
               >
                 العودة للصفحة الرئيسية
               </motion.button>
