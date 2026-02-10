@@ -229,68 +229,58 @@ useEffect(() => {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="flex items-center justify-center flex-row gap-3">
-                  {/* زر أنيق مع تأثير خفيف */}
-                  <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      href="/AddUser"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      <Plus className="w-5 h-5" />
-                      إضافة مستخدم جديد
-                    </Link>
-                  </motion.div>
-
-                  {/* 🔥 زر إدارة التصنيفات */}
-                  <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      href="/AdminCategories"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-medium hover:from-purple-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      <Layers className="w-5 h-5" />
-                      إدارة التصنيفات
-                    </Link>
-                  </motion.div>
-
-                  {/** زر اداره الاعلانات */}
-                  <motion.button
-                    whileHover={{ y: -1 }}
-                    whileTap={{ scale: 0.98 }}
+            <div className="flex flex-col gap-2">
+              {/* أزرار التمرير */}
+              <div className="flex items-center gap-3 overflow-x-auto scroll-smooth">
+                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href="/AddUser"
+                    className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
                   >
-                    <Link
-                      href="/AdminAds"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      <Megaphone className="w-5 h-5" />
-                      إدارة الإعلانات
-                    </Link>
-                  </motion.button>
+                    <Plus className="w-5 h-5" />
+                    إضافة مستخدم جديد
+                  </Link>
+                </motion.div>
 
-                  {/* زر إدارة تبرعات الدم - الصحيح */}
-                  <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
-                    <Link
-                      href="/AdminBloodRequests"
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-medium hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      <Layers className="w-5 h-5" />
-                      إدارة تبرعات الدم
-                    </Link>
-                  </motion.div>
-                </div>
+                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href="/AdminCategories"
+                    className="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all"
+                  >
+                    <Layers className="w-5 h-5" />
+                    إدارة التصنيفات
+                  </Link>
+                </motion.div>
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => router.push("/")}
-                  className=" text-gray-700 hover:text-gray-600 transition-colors duration-300 mt-2"
-                >
-                  العودة للصفحة الرئيسية
-                </motion.button>
+                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href="/AdminAds"
+                    className="flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all"
+                  >
+                    <Megaphone className="w-5 h-5" />
+                    إدارة الإعلانات
+                  </Link>
+                </motion.div>
+
+                <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                  <Link
+                    href="/AdminBloodRequests"
+                    className="flex items-center gap-2 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
+                  >
+                    <Layers className="w-5 h-5" />
+                    إدارة تبرعات الدم
+                  </Link>
+                </motion.div>
+              </div>
+
+              {/* زر العودة */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.push("/")}
+                className="mt-2 px-6 py-3 text-gray-700 hover:text-gray-600 transition-colors"
+              >
+                العودة للصفحة الرئيسية
               </motion.button>
             </div>
           </div>
