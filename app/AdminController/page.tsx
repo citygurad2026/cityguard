@@ -15,18 +15,14 @@ import {
   Users, 
   Shield,
   Eye,
-  Download,
-  RefreshCw,
-  LogOut,
   Layers,
   Megaphone,
   Clock,
   CheckCircle
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { clearSession } from "../store/userSlice";
+
+
   interface UsersData {
   id: number;
   username: string;
@@ -39,13 +35,7 @@ import { clearSession } from "../store/userSlice";
   lastLogin:Date;
   // تم إزالة ownedBusinesses لأن المستخدم العادي لا يملك أعمالاً
 }
-interface StoreUser {
-  id: number;
-  name?: string;
-  username: string;
-  role: "ADMIN";
-  accessToken: string;
-}
+
 interface Category {
   id: number;
   name: string;
@@ -63,7 +53,7 @@ interface Category {
 
 export default function Admin() {
  const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
@@ -76,7 +66,7 @@ export default function Admin() {
   // جلب التصنيفات
   const fetchCategories = async () => {
     try {
-      setLoading(true);
+    
       const response=await Axios({
         ...SummaryApi.category.get_categories
       })
@@ -86,34 +76,10 @@ export default function Admin() {
     } catch (error) {
       console.error('خطأ في جلب التصنيفات:', error);
       toast.error('فشل في جلب التصنيفات');
-    } finally {
-      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-
-useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const res = await Axios({
-        ...SummaryApi.user.get_all_users
-      });
-      setUsersData(res.data.data || []);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchUsers();
-}, []);
-
- 
- useEffect(() => {
+  
+  //جلب المستخدمين النشطاء
   const fetchActiveUsers = async () => {
     try {
       const res = await Axios({
@@ -129,12 +95,18 @@ useEffect(() => {
       console.error("Error fetching active users:", err);
     }
   };
-
-  fetchActiveUsers();
-}, []);
-
-
-
+  //جلب المستخدمين
+    const fetchUsers = async () => {
+    try {
+   
+      const res = await Axios({
+        ...SummaryApi.user.get_all_users
+      });
+      setUsersData(res.data.data || []);
+    } catch (err) {
+      console.error("Error fetching active users:", err);
+    }
+  };
 
  const deleteUser = async (id: number) => {
   if (!confirm("تأكيد حذف المستخدم؟")) return;
@@ -151,7 +123,6 @@ useEffect(() => {
   }
 };
 
-
   const bulkDelete = async () => {
     if (!selectedUsers.length || !confirm(`تأكيد حذف ${selectedUsers.length} مستخدم؟`)) return;
     
@@ -164,8 +135,6 @@ useEffect(() => {
       toast.error("فشل في الحذف الجماعي");
     }
   };
-
-
 
   const handleClick = (id: number) => {
     router.push(`/EditUser/${id}`);
@@ -195,6 +164,32 @@ useEffect(() => {
   pendingAds: 0, // إعلانات بانتظار المراجعة
   activeAds: 0, // إعلانات نشطة
 };
+
+
+
+useEffect(() => {
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+
+      await Promise.all([
+        fetchCategories(),
+        fetchUsers(),
+        fetchActiveUsers(),
+ 
+      ]);
+
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAllData();
+}, []);
+
+
 
   if (loading) {
     return (
@@ -294,6 +289,20 @@ useEffect(() => {
                     إدارة تبرعات الدم
                   </Link>
                 </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-shrink-0"
+                >
+                  <Link
+                    href="/AdminJobs"
+                    className="flex items-center gap-2 px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all"
+                  >
+                    <Layers className="w-5 h-5" />
+                    إدارة الوظائف
+                  </Link>
+                </motion.div>
               </div>
 
               {/* زر العودة */}
@@ -371,6 +380,7 @@ useEffect(() => {
               color: "green",
               onClick: () => router.push("/AdminAds?status=APPROVED"),
             },
+           
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -614,6 +624,8 @@ useEffect(() => {
             </motion.div>
           )}
         </motion.div>
+
+      
       </div>
     </div>
   );

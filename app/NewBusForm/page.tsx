@@ -8,7 +8,7 @@ import { RootState } from "../store/store";
 import SummaryApi from "../common/SummaryApi";
 import { motion } from "framer-motion";
 import { Building, MapPin, Phone, Globe, ArrowRight } from "lucide-react";
-import toast from "react-hot-toast";
+
 
 export default function NewBusinessForm() {
   const [formData, setFormData] = useState({

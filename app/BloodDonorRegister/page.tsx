@@ -15,7 +15,6 @@ import {
   User,
   Shield,
   Heart,
-  AlertCircle,
   CheckCircle,
   ChevronLeft,
   Target,

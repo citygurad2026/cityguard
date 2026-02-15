@@ -153,7 +153,7 @@ const fetchUser = async () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push("/admin")}
+            onClick={() => router.push("/AdminController")}
             className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-2xl font-medium hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-lg"
           >
             العودة للوحة التحكم
@@ -177,7 +177,7 @@ const fetchUser = async () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => router.push("/admin")}
+                onClick={() => router.push("/AdminController")}
                 className="p-3 bg-white rounded-2xl shadow-lg border border-gray-200 hover:bg-gray-50 transition-all duration-300"
               >
                 <ArrowLeft className="w-6 h-6 text-gray-700" />

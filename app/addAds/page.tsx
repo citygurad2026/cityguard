@@ -18,13 +18,8 @@ import {
   Smartphone,
   Tablet,
   Globe,
-  Store,
   Type,
-  FileText,
   Palette,
-  Megaphone,
-  Loader2,
-  Shield
 } from "lucide-react";
 
 interface StoreUser {

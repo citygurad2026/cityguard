@@ -281,8 +281,76 @@ const SummaryApi = {
     method: "GET",
     url: `${baseURL}/api/blooddon/blood-donors`,
   },
-}
+},
+job: {
+  // ===== مسارات عامة (بدون تسجيل) =====
+  getFeaturedJobs: {
+    method: "GET",
+    url: `${baseURL}/api/jobs/featured`,
+  },
+  quickSearchJobs: {
+    method: "GET",
+    url: `${baseURL}/api/jobs/search/quick`,
+  },
+  getJobsByCategory: (type: string) => ({
+    method: "GET",
+    url: `${baseURL}/api/jobs/category/${type}`,
+  }),
+  getPopularCategories: {
+    method: "GET",
+    url: `${baseURL}/api/jobs/popular-categories`,
+  },
+  getJobById: (id: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/jobs/getjob/${id}`,
+  }),
+  getJobsInMyCity: {
+    method: "GET",
+    url: `${baseURL}/api/jobs/mycity`,
+  },
+  getNewJobsNotification: {
+    method: "GET",
+    url: `${baseURL}/api/jobs/notifications/new`,
+  },
 
+  // ===== ADMIN فقط =====
+  getAllJobs: {  // ✅ ADMIN فقط - مع authentication
+    method: "GET",
+    url: `${baseURL}/api/jobs/getall`,
+  },
+  getJobsStatistics: {  // ✅ ADMIN فقط
+    method: "GET",
+    url: `${baseURL}/api/jobs/statistics`,
+  },
+
+  // ===== OWNER فقط =====
+  createJob: {
+    method: "POST",
+    url: `${baseURL}/api/jobs/create`, 
+  },
+  getBusinessJobs: {
+    method: "GET",
+    url: `${baseURL}/api/jobs/business/myjobs`,
+  },
+
+  // ===== ADMIN + OWNER =====
+  updateJob: (id: number | string) => ({
+    method: "PUT",
+    url: `${baseURL}/api/jobs/update/${id}`,
+  }),
+  deleteJob: (id: number | string) => ({
+    method: "DELETE",
+    url: `${baseURL}/api/jobs/delete/${id}`,
+  }),
+  renewJob: (id: number | string) => ({
+    method: "PATCH",
+    url: `${baseURL}/api/jobs/${id}/renew`,
+  }),
+  toggleJobStatus: (id: number | string) => ({
+    method: "PATCH",
+    url: `${baseURL}/api/jobs/${id}/toggle-status`,
+  }),
+},
 
 };
 

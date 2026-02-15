@@ -73,7 +73,7 @@ export default function OwnerDashboard() {
   const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
   
   const router = useRouter();
-  const dispatch = useDispatch();
+
   
   // ⬇️ تغيير هنا: business واحد بدلاً من array
   const [business, setBusiness] = useState<Business | null>(null);
@@ -86,19 +86,13 @@ export default function OwnerDashboard() {
     totalFavorites: 0,
     totalReviews: 0
   });
- 
+  
  const fetchOwnerData = async () => {
-  try {
-     if (!user ) {
-        toast.error("يرجى تسجيل الدخول أولاً");
-         setLoading(false);
-         return
-         }
-    setLoading(true); // ⬅️ بعد التحقق فقط
+  try {  
+    setLoading(true); 
     // 1️⃣ جلب العمل الوحيد للمستخدم
     const response = await Axios({
       ...SummaryApi.owner.get_bus_by_user, 
-      headers: { Authorization: `Bearer ${user.accessToken}`}
     });
     
     setBusiness(response.data.data || [])
@@ -213,29 +207,10 @@ useEffect(() => {
  
   {/**==================== work show window=========== */}
 
-  const [previewModal, setPreviewModal] = useState<{
-  isOpen: boolean;
-  business: Business | null;
-}>({
-  isOpen: false,
-  business: null
-});
+ 
 
 // دالة فتح الـ Modal
-const openPreviewModal = (business: Business) => {
-  setPreviewModal({
-    isOpen: true,
-    business
-  });
-};
 
-// دالة إغلاق الـ Modal
-const closePreviewModal = () => {
-  setPreviewModal({
-    isOpen: false,
-    business: null
-  });
-};
 
   if (loading) {
     return (
@@ -249,14 +224,13 @@ const closePreviewModal = () => {
   }
 
   // ⬇️ إضافة import للـ Calendar إذا لم يكن موجود
-  const Calendar = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  );
+  
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 font-cairo p-6" dir="rtl">
+    <div
+      className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 font-cairo p-6"
+      dir="rtl"
+    >
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
@@ -267,13 +241,15 @@ const closePreviewModal = () => {
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-700 bg-clip-text text-transparent">
-                {business ? `مرحباً بك في ${business.name}` : "لوحة تحكم صاحب العمل"}
+                {business
+                  ? `مرحباً بك في ${business.name}`
+                  : "لوحة تحكم صاحب العمل"}
               </h1>
               <p className="text-gray-600 mt-2 text-lg">
-                {business 
-                  ? "إدارة عملك وتتبع أدائه" 
-                  : "سجل عملك الآن للظهور في دليل الأعمال"
-                } {user?.name && `، ${user.name}`}
+                {business
+                  ? "إدارة عملك وتتبع أدائه"
+                  : "سجل عملك الآن للظهور في دليل الأعمال"}{" "}
+                {user?.name && `، ${user.name}`}
               </p>
             </div>
 
@@ -290,6 +266,15 @@ const closePreviewModal = () => {
                   </Link>
                 </motion.div>
               )}
+              <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href="/OwnerjobAdmin"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  <Plus className="w-5 h-5" />
+                  إدارة الوظائف
+                </Link>
+              </motion.div>
 
               {/* زر تحديث */}
               <motion.button
@@ -301,15 +286,16 @@ const closePreviewModal = () => {
                 <RefreshCw className="w-4 h-4" />
                 تحديث
               </motion.button>
+                  {/* زر العودة */}
+                    <div className="flex justify-center mt-6 mb-6">
+              <button
+                onClick={() => router.push("/")}
+                className="flex items-center gap-2 bg-gradient-to-r from-gray-700 to-gray-900 text-white px-6 py-3 rounded-xl shadow-lg hover:scale-105 hover:shadow-2xl transition transform font-bold"
+              >
+                ⬅ العودة للصفحة الرئيسية
+              </button>
+            </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => router.push("/")}
-                  className=" text-gray-700 hover:text-gray-600 transition-colors duration-300 mt-2"
-                >
-                  العودة للصفحة الرئيسية
-                </motion.button>
             </div>
           </div>
         </motion.div>
@@ -331,7 +317,10 @@ const closePreviewModal = () => {
               سجل عملك الآن للظهور في دليل الأعمال والاستفادة من مميزات المنصة
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Link
                   href="/addBusiness"
                   className="px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 text-lg font-medium inline-flex items-center gap-2"
@@ -371,11 +360,17 @@ const closePreviewModal = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-600 text-sm mb-2">{stat.label}</p>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {stat.value}
+                      </p>
                       {stat.change && (
-                        <p className={`text-xs mt-1 ${
-                          stat.change.startsWith('+') ? 'text-green-600' : 'text-gray-500'
-                        }`}>
+                        <p
+                          className={`text-xs mt-1 ${
+                            stat.change.startsWith("+")
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }`}
+                        >
                           {stat.change} من الشهر الماضي
                         </p>
                       )}
@@ -402,9 +397,13 @@ const closePreviewModal = () => {
                       {business.name.charAt(0)}
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">{business.name}</h2>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        {business.name}
+                      </h2>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(business.status)}`}>
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(business.status)}`}
+                        >
                           {getStatusText(business.status)}
                         </span>
                         {business.featured && (
@@ -420,18 +419,18 @@ const closePreviewModal = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-3">
-                  
-                      <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => router.push(`/OwnerAds`)}
-                          className="px-4 py-2.5 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors duration-300 flex items-center gap-2"
-                        >
-                          <Megaphone className="w-4 h-4" />
-                            إدارة الإعلانات
-                        </motion.button>
+                
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => router.push(`/OwnerAds`)}
+                      className="px-4 py-2.5 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors duration-300 flex items-center gap-2"
+                    >
+                      <Megaphone className="w-4 h-4" />
+                      إدارة الإعلانات
+                    </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -458,21 +457,27 @@ const closePreviewModal = () => {
                         <MapPin className="w-5 h-5 text-gray-400" />
                         <div>
                           <p className="text-sm text-gray-600">العنوان</p>
-                          <p className="text-gray-900">{business.address || "غير محدد"}</p>
+                          <p className="text-gray-900">
+                            {business.address || "غير محدد"}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <Phone className="w-5 h-5 text-gray-400" />
                         <div>
                           <p className="text-sm text-gray-600">رقم الهاتف</p>
-                          <p className="text-gray-900">{business.phone || "غير محدد"}</p>
+                          <p className="text-gray-900">
+                            {business.phone || "غير محدد"}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <MapPin className="w-5 h-5 text-gray-400" />
                         <div>
                           <p className="text-sm text-gray-600">المدينة</p>
-                          <p className="text-gray-900">{business.city || "غير محدد"}</p>
+                          <p className="text-gray-900">
+                            {business.city || "غير محدد"}
+                          </p>
                         </div>
                       </div>
                       <div>
@@ -496,7 +501,9 @@ const closePreviewModal = () => {
                           <Eye className="w-6 h-6 text-blue-500" />
                           <div>
                             <p className="text-sm text-gray-600">المشاهدات</p>
-                            <p className="text-2xl font-bold text-gray-900">{business.stats?.views || 0}</p>
+                            <p className="text-2xl font-bold text-gray-900">
+                              {business.stats?.views || 0}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -505,7 +512,9 @@ const closePreviewModal = () => {
                           <Heart className="w-6 h-6 text-red-500" />
                           <div>
                             <p className="text-sm text-gray-600">المفضلة</p>
-                            <p className="text-2xl font-bold text-gray-900">{business._count?.favorites || 0}</p>
+                            <p className="text-2xl font-bold text-gray-900">
+                              {business._count?.favorites || 0}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -514,7 +523,9 @@ const closePreviewModal = () => {
                           <Star className="w-6 h-6 text-amber-500" />
                           <div>
                             <p className="text-sm text-gray-600">التقييمات</p>
-                            <p className="text-2xl font-bold text-gray-900">{business._count?.reviews || 0}</p>
+                            <p className="text-2xl font-bold text-gray-900">
+                              {business._count?.reviews || 0}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -523,7 +534,9 @@ const closePreviewModal = () => {
                           <Users className="w-6 h-6 text-green-500" />
                           <div>
                             <p className="text-sm text-gray-600">المتابعين</p>
-                            <p className="text-2xl font-bold text-gray-900">{business._count?.follows || 0}</p>
+                            <p className="text-2xl font-bold text-gray-900">
+                              {business._count?.follows || 0}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -535,23 +548,27 @@ const closePreviewModal = () => {
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => router.push(`/business/${business.slug}/reviews`)}
+                          onClick={() =>
+                            router.push(`/business/${business.slug}/reviews`)
+                          }
                           className="px-4 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors duration-300 flex items-center gap-2"
                         >
                           <MessageCircle className="w-4 h-4" />
                           التقييمات
                         </motion.button>
-                        
+
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => router.push(`/business/${business.slug}/analytics`)}
+                          onClick={() =>
+                            router.push(`/business/${business.slug}/analytics`)
+                          }
                           className="px-4 py-2.5 bg-purple-500 text-white rounded-xl hover:bg-purple-600 transition-colors duration-300 flex items-center gap-2"
                         >
                           <BarChart3 className="w-4 h-4" />
                           تحليلات مفصلة
                         </motion.button>
-                        
+
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -567,7 +584,6 @@ const closePreviewModal = () => {
                 </div>
               </div>
             </motion.div>
-            
           </>
         )}
       </div>

@@ -5,7 +5,7 @@ import Axios from "../utilts/Axios";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowRight, UserPlus, Shield, User } from "lucide-react";
+import { ArrowRight, UserPlus,  User } from "lucide-react";
 import SummaryApi from "../common/SummaryApi";
 
 export default function AddUser() {

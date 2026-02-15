@@ -8,7 +8,7 @@ import Axios from "@/app/utilts/Axios";
 import SummaryApi from "@/app/common/SummaryApi";
 import { toast } from "react-hot-toast";
 import { 
-  Building, Clock, MapPin, Globe, 
+  Building, Clock, MapPin,
   Image as ImageIcon, Save, X, 
   Trash2, Upload, Calendar, Tag,
   Phone, Map, Globe as GlobeIcon

@@ -14,7 +14,6 @@ import {
 } from "framer-motion";
 import { 
   Search, 
-  Filter, 
   Plus, 
   Edit3, 
   Trash2, 
@@ -28,9 +27,6 @@ import {
   BarChart3,
   Calendar,
   Store,
-  Users,
-  LogOut,
-  Layers,
   ArrowLeft
 } from "lucide-react";
 

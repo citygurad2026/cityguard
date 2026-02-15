@@ -14,7 +14,6 @@ import {
   Phone,
   User,
   Bell,
-  Clock,
   Edit,
   History,
   Heart,
@@ -29,7 +28,6 @@ import {
   Shield,
   Trophy,
   Target,
-  Zap,
 } from "lucide-react";
 
 const BloodDonorProfile = () => {

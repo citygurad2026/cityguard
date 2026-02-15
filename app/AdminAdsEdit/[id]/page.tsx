@@ -22,7 +22,7 @@ import {
   Palette,
   Loader2,
   AlertCircle,
-  Eye,
+
 } from "lucide-react";
 
 interface AdminUser {
