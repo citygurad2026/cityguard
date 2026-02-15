@@ -81,7 +81,7 @@ export default function AdminJobs() {
       });
 
       toast.success(response.data.message || "تم تغيير حالة الوظيفة");
-      fetchAllJobs();
+       fetchJobs()
       fetchStatistics();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "فشل في تغيير حالة الوظيفة");
@@ -104,6 +104,20 @@ export default function AdminJobs() {
       setLoading(false);
     }
   };
+  const fetchStatistics = async () => {
+  try {
+    const response = await Axios({
+      ...SummaryApi.job.getJobsStatistics
+    });
+
+    if (response.data.success) {
+      setStats(response.data.data);
+    }
+  } catch (error: any) {
+    toast.error("فشل في جلب الإحصائيات");
+  }
+};
+
 
   useEffect(() => {
 
@@ -119,7 +133,7 @@ export default function AdminJobs() {
       });
 
       toast.success(response.data.message || "تم تجديد الوظيفة");
-      fetchAllJobs();
+       fetchJobs();
       fetchStatistics();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "فشل في تجديد الوظيفة");
@@ -136,7 +150,7 @@ export default function AdminJobs() {
       });
 
       toast.success("✅ تم حذف الوظيفة بنجاح");
-      fetchAllJobs();
+       fetchJobs()
       fetchStatistics();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "فشل في حذف الوظيفة");
@@ -158,7 +172,7 @@ export default function AdminJobs() {
       
       toast.success(`✅ تم حذف ${selectedJobs.length} وظيفة بنجاح`);
       setSelectedJobs([]);
-      fetchAllJobs();
+      fetchJobs()
       fetchStatistics();
     } catch (error: any) {
       toast.error("فشل في حذف الوظائف المحددة");
