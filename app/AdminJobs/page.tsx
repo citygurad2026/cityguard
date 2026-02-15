@@ -343,7 +343,7 @@ export default function AdminJobs() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  fetchAllJobs();
+                  fetchJobs()
                   fetchStatistics();
                 }}
                 className="flex items-center gap-2 px-4 py-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-300"
