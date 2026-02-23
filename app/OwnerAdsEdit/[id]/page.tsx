@@ -19,11 +19,8 @@ import {
   Smartphone,
   Tablet,
   Globe,
-  Store,
   Type,
-  FileText,
   Palette,
-  Loader2,
   AlertCircle,
   Eye
 } from "lucide-react";
@@ -34,11 +31,6 @@ interface StoreUser {
   username: string;
   role: "ADMIN" | "OWNER";
   accessToken: string;
-}
-
-interface Business {
-  id: number;
-  name: string;
 }
 interface Ad {
   id: number;

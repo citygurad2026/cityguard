@@ -15,14 +15,9 @@ import {
   Calendar,
   Edit3,
   Star,
-  ChevronRight,
   Crown,
-  Mail,
   Droplet,
   Target,
-  History,
-  BarChart,
-  Settings,
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
@@ -126,8 +121,7 @@ export default function ProfilePage() {
         }
         
         const response = await Axios({
-          ...SummaryApi.user.getUserById(user.id),
-          headers: { Authorization: `Bearer ${user.accessToken}` },
+          ...SummaryApi.user.getUserById(user.id)
         });
 
         const data = response.data.data;
@@ -138,7 +132,6 @@ export default function ProfilePage() {
           try {
             const donorRes = await Axios({
               ...SummaryApi.bloodDonors.getMyDonorProfile,
-              headers: { Authorization: `Bearer ${user.accessToken}` },
             });
             
             if (donorRes.data.success) {
@@ -202,17 +195,6 @@ export default function ProfilePage() {
     description: "التقييمات المقدمة",
   },
 ];
-
-
-  const quickActions = [
-    {
-      title: "تعديل الملف",
-      description: "عدل معلوماتك الشخصية",
-      icon: Edit3,
-      color: "from-blue-500 to-blue-600",
-      href: "/UserProfileEdit"
-    },
-  ];
 
   if (loading) {
     return (

@@ -25,7 +25,7 @@ interface UserForm {
   username: string;
   name: string;
   phone: string;
-  role: "admin" | "user";
+  role: "admin" | "user" |"owner";
   password: string;
   createdAt: string;
 }

@@ -73,10 +73,14 @@ const SummaryApi = {
       method: "GET",
       url: `${baseURL}/api/bus/getbusinesses`,
     },
-   get_bus_by_user: {
+   get_bus_by_id: {
     method: "GET",
-    url: `${baseURL}/api/bus/getbusinesse`  
+    url: `${baseURL}/api/bus/getmybusinesse`  
     },
+    get_public_bus: (id: number | string)  => ({
+      method:"GET",
+      url:`${baseURL}/api/bus/getBusinessPublicByid/${id}`
+    }),
 
       updateBus: (id: number | string) => ({
       method: "PUT",
@@ -351,6 +355,113 @@ job: {
     url: `${baseURL}/api/jobs/${id}/toggle-status`,
   }),
 },
+favorites:{
+  toggleFavorite: (businessId: number | string) => ({
+    method: "POST",
+    url: `${baseURL}/api/favorites/toggle/${businessId}`,
+  }),
+  getUserFavorites: {
+    method: "GET",
+    url: `${baseURL}/api/favorites/get`,
+  },
+  checkFavoriteStatus: (businessId: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/favorites/check/${businessId}`,
+  }),
+  getBusinessFavoritesCount: (businessId: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/favorites/count/${businessId}`,
+  }),
+},
+bookmarks:{
+  addBookmark: (businessId: number | string) => ({
+    method: "POST",
+    url: `${baseURL}/api/bookmarks/add/${businessId}`,
+  }),
+  removeBookmark: (businessId: number | string) => ({
+    method: "DELETE",
+    url: `${baseURL}/api/bookmarks/remove/${businessId}`,
+  }),
+  getUserBookmarks: {
+    method: "GET",
+    url: `${baseURL}/api/bookmarks/get`,
+  },
+  updateBookmarkNote: (id: number | string) => ({
+    method: "PATCH",
+    url: `${baseURL}/api/bookmarks/update/${id}`,
+  }),
+  checkBookmarkStatus: (businessId: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/bookmarks/check/${businessId}`,
+  })
+},
+commit:{
+  get_business_comments: (businessId: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/commit/business/${businessId}`,
+  }),
+  
+  // إضافة تعليق جديد (protected)
+  create_comment: {
+    method: "POST",
+    url: `${baseURL}/api/commit/create`,
+  },
+  
+  // تعديل تعليق (protected)
+  update_comment: (id: number | string) => ({
+    method: "PUT",
+    url:  `${baseURL}/api/commit/update/${id}`,
+  }),
+  
+  // حذف تعليق (protected)
+  delete_comment:(id: number | string) => ( {
+    method: "DELETE",
+    url: `${baseURL}/api/commit/delete/${id}`,
+  }),
+},
+review:{
+  get_business_reviews: (businessId: number | string) => ({
+    method: "GET",
+    url: `${baseURL}/api/reviews/business/${businessId}`,
+  }),
+  
+  // إنشاء تقييم جديد (محمي)
+  create_review: {
+    method: "POST",
+    url: `${baseURL}/api/reviews/create`,
+  },
+  // تحديث تقييم (محمي)
+  update_review: (id:number | string) => ({
+    method: "PUT",
+    url: `${baseURL}/api/reviews/update/${id}`,
+  }),
+  
+  // حذف تقييم (محمي)
+  delete_review: (id:number | string) => ({
+    method: "DELETE",
+    url: `${baseURL}/api/reviews/delete/${id}`,
+  }),
+  
+  // الإعجاب بتقييم (محمي)
+  mark_helpful: (id:number | string) => ({
+    method: "POST",
+    url: `${baseURL}/api/reviews/${id}/helpful`,
+  }),
+  
+  // قبول تقييم (أدمن)
+  approve_review: (id:number | string) => ({
+    method: "PUT",
+    url: `${baseURL}/api/reviews/admin/${id}/approve`,
+  }),
+  
+  // رفض تقييم (أدمن)
+  reject_review: (id:number | string) => ({
+    method: "PUT",
+    url: `${baseURL}/api/reviews/admin/${id}/reject`,
+  }),
+
+}
+
 
 };
 

@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import Axios from "../utilts/Axios";
 import { toast } from "react-hot-toast";
-
 import SummaryApi from "../common/SummaryApi";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -275,22 +274,22 @@ export default function JobsPage() {
       className="min-h-screen bg-gradient-to-b from-gray-50 to-white"
       dir="rtl"
     >
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-600/50 to-transparent" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      {/* Hero Section - Like Blood Page with Blue Gradient */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600" />
+        
+        <div className="relative container mx-auto px-4 py-16 md:py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center max-w-3xl mx-auto"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-8 text-white">
               <Sparkles className="w-4 h-4" />
               <span className="text-sm">أكثر من 5000+ وظيفة متاحة</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               ابحث عن <span className="text-yellow-300">وظيفة أحلامك</span>
             </h1>
 
@@ -298,7 +297,7 @@ export default function JobsPage() {
               آلاف الفرص الوظيفية في مختلف المجالات تنتظرك
             </p>
 
-            {/* Search Bar */}
+            {/* Search Bar - Like Blood Page */}
             <div className="relative max-w-2xl mx-auto mb-8">
               <div className="relative group">
                 <input
@@ -317,20 +316,18 @@ export default function JobsPage() {
                   >
                     <X className="w-5 h-5" />
                   </button>
-                  
                 )}
               </div>
             </div>
-           
-           
-            {/* Quick Filters */}
+
+            {/* Quick Filters - Like Blood Page */}
             <div className="relative z-20">
               <div className="flex flex-wrap justify-center gap-3">
                 {["مطور", "محاسب", "مهندس", "مسوق", "مصمم"].map((term) => (
                   <button
                     key={term}
                     onClick={() => setSearchTerm(term)}
-                    className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm hover:bg-white/20 transition-colors"
+                    className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm text-white hover:bg-white/30 transition-colors"
                   >
                     {term}
                   </button>
@@ -339,47 +336,46 @@ export default function JobsPage() {
             </div>
           </motion.div>
         </div>
-        
-        {/* Wave Divider */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none">
-          <svg
-            viewBox="0 0 1440 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full h-full"
-          >
-            <path
-              d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-              fill="white"
-            />
-          </svg>
-        </div>
-        
       </div>
-      
 
-      {/* Stats Section - إحصائيات ثابتة لأن الباك إند ما يرجع إحصائيات عامة */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10">
+      {/* Stats Section - Like Blood Page Cards */}
+      <div className="container mx-auto px-4 -mt-10 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             {
               icon: Briefcase,
               label: "وظيفة متاحة",
               value: pagination.total || "0",
+              color: "from-blue-500 to-blue-600"
             },
-            { icon: Building2, label: "شركة", value: "1,200+" },
-            { icon: Users, label: "باحث عن عمل", value: "15,000+" },
-            { icon: TrendingUp, label: "توظيف ناجح", value: "3,500+" },
+            { 
+              icon: Building2, 
+              label: "شركة", 
+              value: "1,200+",
+              color: "from-orange-500 to-orange-600"
+            },
+            { 
+              icon: Users, 
+              label: "باحث عن عمل", 
+              value: "15,000+",
+              color: "from-green-500 to-green-600"
+            },
+            { 
+              icon: TrendingUp, 
+              label: "توظيف ناجح", 
+              value: "3,500+",
+              color: "from-blue-500 to-blue-600"
+            },
           ].map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-100"
+              className="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition"
             >
-              <div className="inline-flex p-3 bg-blue-50 rounded-xl mb-3">
-                <stat.icon className="w-6 h-6 text-blue-600" />
+              <div className={`w-14 h-14 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mx-auto mb-3`}>
+                <stat.icon className="w-6 h-6 text-white" />
               </div>
               <div className="text-2xl font-bold text-gray-900">
                 {stat.value}
@@ -391,23 +387,23 @@ export default function JobsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Filter Bar */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
+      <div className="container mx-auto px-4 py-12">
+        {/* Filter Bar - Like Blood Page */}
+        <div className="bg-white rounded-2xl shadow-lg p-4 mb-8">
           <div className="flex flex-wrap items-center gap-4">
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
                 showFilters
-                  ? "bg-blue-500 text-white"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               <SlidersHorizontal className="w-5 h-5" />
               <span>فلتر متقدم</span>
               {hasActiveFilters && (
-                <span className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="w-5 h-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center">
                   {
                     Object.values({
                       selectedCity,
@@ -431,7 +427,7 @@ export default function JobsPage() {
                 </span>
               )}
               {selectedType && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-50 text-orange-700 rounded-lg text-sm">
                   <Briefcase className="w-3 h-3" />
                   {selectedType}
                   <button onClick={() => setSelectedType("")}>
@@ -440,7 +436,7 @@ export default function JobsPage() {
                 </span>
               )}
               {selectedRegion && (
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-lg text-sm">
                   <MapPin className="w-3 h-3" />
                   {selectedRegion}
                   <button onClick={() => setSelectedRegion("")}>
@@ -487,7 +483,7 @@ export default function JobsPage() {
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="text-sm text-red-600 hover:text-red-700 font-medium"
+                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
               >
                 مسح الكل
               </button>
@@ -529,7 +525,7 @@ export default function JobsPage() {
                     <select
                       value={selectedType}
                       onChange={(e) => setSelectedType(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-200 bg-white"
                     >
                       <option value="">كل المجالات</option>
                       {filters.categories.map((type) => (
@@ -547,7 +543,7 @@ export default function JobsPage() {
                     <select
                       value={selectedRegion}
                       onChange={(e) => setSelectedRegion(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white"
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-white"
                     >
                       <option value="">كل المناطق</option>
                       {filters.regions.map((region) => (
@@ -591,24 +587,26 @@ export default function JobsPage() {
           </select>
         </div>
 
-        {/* Jobs Grid/List */}
+        {/* Jobs Grid/List - Like Blood Page Cards */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="relative">
-              <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Briefcase className="w-8 h-8 text-blue-600 animate-pulse" />
+          <div className="min-h-[400px] flex items-center justify-center">
+            <div className="text-center">
+              <div className="relative">
+                <div className="w-24 h-24 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Briefcase className="w-8 h-8 text-blue-600 animate-pulse" />
+                </div>
               </div>
+              <p className="mt-4 text-gray-600">جاري تحميل الوظائف...</p>
             </div>
-            <p className="mt-4 text-gray-600">جاري تحميل الوظائف...</p>
           </div>
         ) : jobs.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20 bg-white rounded-3xl shadow-sm"
+            className="text-center py-20 bg-white rounded-3xl shadow-lg"
           >
-            <div className="w-32 h-32 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-32 h-32 bg-gradient-to-br from-blue-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Search className="w-12 h-12 text-blue-400" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -620,7 +618,7 @@ export default function JobsPage() {
             </p>
             <button
               onClick={clearFilters}
-              className="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-semibold"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition font-semibold"
             >
               مسح جميع الفلاتر
             </button>
@@ -642,44 +640,38 @@ export default function JobsPage() {
                 className={`group ${viewMode === "grid" ? "" : "w-full"}`}
               >
                 <div
-                  className={`relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden ${
+                  className={`relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden ${
                     viewMode === "list"
                       ? "flex flex-col md:flex-row items-start"
                       : "flex flex-col"
                   }`}
                 >
-                  {/* Company Logo - Container */}
+                  {/* Company Logo */}
                   <div
-                    className={`
-            ${
-              viewMode === "list"
-                ? "w-full md:w-32 p-4 flex items-center justify-center md:self-center"
-                : "p-6 pb-0"
-            }
-          `}
+                    className={
+                      viewMode === "list"
+                        ? "w-full md:w-32 p-4 flex items-center justify-center md:self-center"
+                        : "p-6 pb-0"
+                    }
                   >
                     <div
-                      className={`
-              bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl 
-              flex items-center justify-center
-              ${
-                viewMode === "list"
-                  ? "w-20 h-20 md:w-16 md:h-16"
-                  : "w-16 h-16 mb-4"
-              }
-            `}
+                      className={`bg-gradient-to-br ${
+                        index % 3 === 0 
+                          ? "from-blue-500 to-blue-600" 
+                          : index % 3 === 1 
+                            ? "from-orange-500 to-orange-600" 
+                            : "from-green-500 to-green-600"
+                      } rounded-2xl flex items-center justify-center ${
+                        viewMode === "list"
+                          ? "w-20 h-20 md:w-16 md:h-16"
+                          : "w-16 h-16 mb-4"
+                      }`}
                     >
-                      <Building2
-                        className={`
-                ${
-                  viewMode === "list" ? "w-8 h-8 md:w-6 md:h-6" : "w-8 h-8"
-                } text-gray-400
-              `}
-                      />
+                      <Building2 className={`${viewMode === "list" ? "w-8 h-8 md:w-6 md:h-6" : "w-8 h-8"} text-white`} />
                     </div>
                   </div>
 
-                  {/* Content - يأخذ المساحة المتبقية */}
+                  {/* Content */}
                   <div className="flex-1 flex flex-col p-4 w-full md:w-auto">
                     {/* Title & Company */}
                     <div className="mb-3">
@@ -693,10 +685,10 @@ export default function JobsPage() {
                       </div>
                     </div>
 
-                    {/* Details - تحسين للشاشات الصغيرة */}
+                    {/* Details */}
                     <div className="flex flex-wrap gap-2 mb-4">
                       {job.city && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 text-gray-600 rounded-lg text-xs whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs whitespace-nowrap">
                           <MapPin className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate max-w-[100px] md:max-w-none">
                             {job.city} {job.region ? `(${job.region})` : ""}
@@ -704,7 +696,7 @@ export default function JobsPage() {
                         </span>
                       )}
                       {job.type && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 text-gray-600 rounded-lg text-xs whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-lg text-xs whitespace-nowrap">
                           <Briefcase className="w-3 h-3 flex-shrink-0" />
                           {job.type}
                         </span>
@@ -719,14 +711,14 @@ export default function JobsPage() {
                       )}
                     </div>
 
-                    {/* Description - إخفاء في الشاشات الصغيرة جداً لتحسين المساحة */}
+                    {/* Description */}
                     {job.description && (
                       <p className="text-sm text-gray-600 line-clamp-2 mb-4 hidden sm:block">
                         {job.description}
                       </p>
                     )}
 
-                    {/* Footer - تحسين للشاشات الصغيرة */}
+                    {/* Footer */}
                     <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center mt-4 pt-4 border-t border-gray-100 gap-3">
                       <div className="flex items-center gap-2">
                         <Clock3 className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -735,7 +727,7 @@ export default function JobsPage() {
                         </span>
                       </div>
 
-                      {/* الأزرار - تحسين للشاشات الصغيرة */}
+                      {/* Buttons */}
                       <div className="flex flex-wrap items-center gap-2 w-full xs:w-auto">
                         <button
                           onClick={() => toggleSaveJob(job.id)}
@@ -762,7 +754,7 @@ export default function JobsPage() {
 
                         <button
                           onClick={() => setOpenJob(job)}
-                          className="px-3 py-1.5 md:px-4 md:py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors text-xs md:text-sm font-semibold"
+                          className="px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition text-xs md:text-sm font-semibold"
                         >
                           عرض
                         </button>
@@ -770,21 +762,18 @@ export default function JobsPage() {
                         <button
                           onClick={() => handleApply(job)}
                           disabled={applyingJobId === job.id}
-                          className="px-3 py-1.5 md:px-4 md:py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors text-xs md:text-sm font-semibold flex items-center gap-1 disabled:opacity-50"
+                          className="px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg transition text-xs md:text-sm font-semibold flex items-center gap-1 disabled:opacity-50"
                         >
                           {applyingJobId === job.id ? (
                             "جاري..."
                           ) : (
-                            <>
-                             
-                              <span className=" sm:inline">واتساب</span>
-                            </>
+                            "واتساب"
                           )}
                         </button>
                       </div>
                     </div>
 
-                    {/* Contact Info - تحسين للشاشات الصغيرة */}
+                    {/* Contact Info */}
                     {job.business.phone && (
                       <div className="mt-3 text-xs text-gray-500 flex items-center gap-2">
                         <Phone className="w-3 h-3 flex-shrink-0" />
@@ -819,7 +808,7 @@ export default function JobsPage() {
                   Math.abs(page - pagination.page) <= 2,
               )
               .map((page, index, array) => (
-                <>
+                <div key={page} className="flex items-center">
                   {index > 0 && array[index - 1] !== page - 1 && (
                     <span className="px-3 py-2 text-gray-400">...</span>
                   )}
@@ -827,13 +816,13 @@ export default function JobsPage() {
                     onClick={() => fetchJobs(page)}
                     className={`px-4 py-2 rounded-lg transition-colors ${
                       pagination.page === page
-                        ? "bg-blue-500 text-white"
+                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
                         : "hover:bg-gray-100"
                     }`}
                   >
                     {page}
                   </button>
-                </>
+                </div>
               ))}
 
             <button
@@ -846,7 +835,7 @@ export default function JobsPage() {
           </div>
         )}
 
-        {/* show job window */}
+        {/* Job Modal */}
         {openJob && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-2 lg:px-0">
             <motion.div
@@ -855,15 +844,13 @@ export default function JobsPage() {
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-white rounded-2xl max-w-2xl w-full p-6 relative"
             >
-              {/* زر إغلاق */}
               <button
                 onClick={() => setOpenJob(null)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                className="absolute top-4 left-4 text-gray-500 hover:text-gray-700"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              {/* محتوى الوظيفة */}
               <h3 className="text-xl font-bold mb-2">{openJob.title}</h3>
               <p className="text-gray-700 mb-2">{openJob.business.name}</p>
               {openJob.city && (
@@ -881,18 +868,17 @@ export default function JobsPage() {
                 <p className="mt-4 text-gray-600">{openJob.description}</p>
               )}
 
-              {/* أزرار الاتصال والحفظ */}
               <div className="mt-6 flex gap-2">
                 <button
                   onClick={() => handleApply(openJob)}
-                  className="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 flex items-center gap-1"
+                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:shadow-lg flex items-center gap-1"
                 >
                   <MessageCircle className="w-4 h-4" />
                   واتساب
                 </button>
                 <button
                   onClick={() => toggleSaveJob(openJob.id)}
-                  className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300"
+                  className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:shadow-lg"
                 >
                   حفظ
                 </button>
@@ -901,6 +887,17 @@ export default function JobsPage() {
           </div>
         )}
       </div>
+
+      {/* Global Styles */}
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }

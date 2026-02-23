@@ -96,7 +96,7 @@ export default function Header() {
       href: '#', 
       dropdown: categories.slice(0, 8).map(cat => ({
         name: cat.name,
-        href: `/category/${cat.slug}`,
+        href: `/Categories/${cat.slug}`,
         count: cat.businessCount || 0
       }))
     },

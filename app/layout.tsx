@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono ,Cairo} from "next/font/google";
 import "./globals.css";
 import Provider from './Provider'
+import { Toaster } from "react-hot-toast";
 
 
 const geistSans = Geist({
@@ -31,12 +32,53 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased`}
-      >
-        <Provider>
-          {children}
-        </Provider>
+      <body className={`${cairo.className} antialiased`}>
+        <Provider>{children}</Provider>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            success: {
+              duration: 3000,
+              style: {
+                background: "rgba(34, 197, 94, 0.1)", // أخضر شفاف
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(34, 197, 94, 0.2)",
+                color: "#16a34a", // أخضر غامق للنص
+              },
+              iconTheme: {
+                primary: "#16a34a",
+                secondary: "white",
+              },
+            },
+            error: {
+              duration: 6000,
+              style: {
+                background: "rgba(239, 68, 68, 0.1)", // أحمر شفاف
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(239, 68, 68, 0.2)",
+                color: "#dc2626",
+              },
+              iconTheme: {
+                primary: "#dc2626",
+                secondary: "white",
+              },
+            },
+            // النمط الافتراضي (للإشعارات العادية)
+            style: {
+              background: "rgba(15, 23, 42, 0.1)", // داكن شفاف أو أبيض حسب الثيم
+              backdropFilter: "blur(8px)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              color: "#0f172a", // لون النص
+              fontSize: "14px",
+              fontWeight: "500",
+              padding: "12px 16px",
+              borderRadius: "12px", // زوايا دائرية ناعمة
+              boxShadow:
+                "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02)",
+            },
+          }}
+        />
       </body>
     </html>
   );

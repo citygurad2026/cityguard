@@ -113,7 +113,7 @@ export default function EditBusinessPage() {
       
       // جلب بيانات العمل
       const resBus = await Axios({
-       ...SummaryApi.owner.get_bus_by_user, 
+       ...SummaryApi.owner.get_bus_by_id, 
       });
  
       const busData = resBus.data.data;

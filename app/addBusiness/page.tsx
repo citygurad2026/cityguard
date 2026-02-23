@@ -38,7 +38,12 @@ interface FormData {
   website: string;
   openingHours: OpeningHours;
   featured?: boolean;
+  lat?: string;              // نص لأن input type="text"
+  lng?: string;
+  isVerified?: boolean;      // يمكن تظهر كـ checkbox للمدير أو أداة التحقق
+  verificationDate?: string; // نص أو تاريخ من input type="date"
 }
+
 interface Category {
   id: number;
   name: string;
@@ -333,7 +338,7 @@ export default function AddBusiness() {
   };
 
 const handleSubmit = async (e: React.FormEvent) => {
-  console.log("🚀 handleSubmit بدأ");
+
   e.preventDefault();
   if (!validateForm()) return;
 
@@ -393,7 +398,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     // 🔹 إضافة الصور - اسم الحقل يجب أن يكون 'images' إذا كان الباك اند يتوقعه
     // أو اسم الحقل الذي يعرفه multer middleware
     images.forEach((image) => {
-      submitFormData.append("images", image.file); // أو "files" حسب إعداد multer
+      submitFormData.append("images", image.file); 
     });
 
     const response = await Axios({
@@ -560,7 +565,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      الفئة 
+                      الفئة
                     </label>
                     <select
                       name="categoryId"
@@ -615,6 +620,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </div>
               </motion.div>
             )}
+            {/* MORE DETAILS */}
+
+            
 
             {/* CONTACT */}
             {activeTab === "contact" && (
@@ -769,7 +777,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                           handleOpeningHoursChange(
                             day,
                             "closed",
-                            !e.target.checked
+                            !e.target.checked,
                           )
                         }
                         className="w-5 h-5 text-green-600 focus:ring-green-500"
@@ -796,7 +804,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                               handleOpeningHoursChange(
                                 day,
                                 "open",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500 w-32"
@@ -809,7 +817,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                               handleOpeningHoursChange(
                                 day,
                                 "close",
-                                e.target.value
+                                e.target.value,
                               )
                             }
                             className="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-green-500 w-32"

@@ -71,31 +71,40 @@ interface StoreUser {
 
 export default function OwnerDashboard() {
   const user = useSelector((state: RootState) => state.user.user) as StoreUser | null;
-  
   const router = useRouter();
-
-  
-  // ⬇️ تغيير هنا: business واحد بدلاً من array
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState({
-    totalBusinesses: 0,
-    activeBusinesses: 0,
-    pendingBusinesses: 0,
-    totalViews: 0,
-    totalFavorites: 0,
-    totalReviews: 0
-  });
+const [stats, setStats] = useState({
+  totalBusinesses: 0,
+  activeBusinesses: 0,
+  pendingBusinesses: 0,
+  totalViews: 0,
+  totalFavorites: 0,
+  totalReviews: 0,
+  totalFollowers: 0,   // أضف
+  totalComments: 0     // أضف
+});
+  
   
  const fetchOwnerData = async () => {
   try {  
     setLoading(true); 
     // 1️⃣ جلب العمل الوحيد للمستخدم
     const response = await Axios({
-      ...SummaryApi.owner.get_bus_by_user, 
+      ...SummaryApi.owner.get_bus_by_id, 
     });
     
-    setBusiness(response.data.data || [])
+   // بعد fetchOwnerData
+setBusiness(response.data.data || null);
+setStats(
+  response.data.stats || {
+    totalViews: 0,
+    totalFavorites: 0,
+    totalReviews: 0,
+    totalFollowers: 0,
+    totalComments: 0,
+  },
+);
 
   } catch (err: any) {
     console.error("Error:", err.response?.data || err.message);
@@ -120,19 +129,20 @@ useEffect(() => {
     try {
       await Axios({
         ...SummaryApi.owner.deleteBus(business.id),
-        headers: { Authorization: `Bearer ${user!.accessToken}` }
       });
 
       toast.success("✅ تم حذف العمل بنجاح");
       setBusiness(null);
-      setStats({
-        totalBusinesses: 0,
-        activeBusinesses: 0,
-        pendingBusinesses: 0,
-        totalViews: 0,
-        totalFavorites: 0,
-        totalReviews: 0
-      });
+     setStats({
+       totalBusinesses: 0,
+       activeBusinesses: 0,
+       pendingBusinesses: 0,
+       totalViews: 0,
+       totalFavorites: 0,
+       totalReviews: 0,
+       totalFollowers: 0,
+       totalComments: 0,
+     });
     } catch (err: any) {
       toast.error(err.response?.data?.message || "فشل في حذف العمل");
     }
@@ -168,9 +178,10 @@ useEffect(() => {
       color: "amber",
       change: "+3"
     },
+    { label: "التعليقات", value: stats.totalComments, icon: MessageCircle, color: "teal", change: "" },
     {
       label: "المتابعين",
-      value: business?._count?.follows || 0,
+      value: stats.totalFollowers,
       icon: Users,
       color: "blue",
       change: "+2"
@@ -203,14 +214,6 @@ useEffect(() => {
       default: return status;
     }
   };
-
- 
-  {/**==================== work show window=========== */}
-
- 
-
-// دالة فتح الـ Modal
-
 
   if (loading) {
     return (
@@ -502,7 +505,7 @@ useEffect(() => {
                           <div>
                             <p className="text-sm text-gray-600">المشاهدات</p>
                             <p className="text-2xl font-bold text-gray-900">
-                              {business.stats?.views || 0}
+                              {stats.totalViews || 0}
                             </p>
                           </div>
                         </div>
@@ -513,7 +516,7 @@ useEffect(() => {
                           <div>
                             <p className="text-sm text-gray-600">المفضلة</p>
                             <p className="text-2xl font-bold text-gray-900">
-                              {business._count?.favorites || 0}
+                              {stats.totalFavorites|| 0}
                             </p>
                           </div>
                         </div>
@@ -524,7 +527,7 @@ useEffect(() => {
                           <div>
                             <p className="text-sm text-gray-600">التقييمات</p>
                             <p className="text-2xl font-bold text-gray-900">
-                              {business._count?.reviews || 0}
+                              {stats.totalReviews|| 0}
                             </p>
                           </div>
                         </div>
@@ -535,7 +538,7 @@ useEffect(() => {
                           <div>
                             <p className="text-sm text-gray-600">المتابعين</p>
                             <p className="text-2xl font-bold text-gray-900">
-                              {business._count?.follows || 0}
+                              {stats.totalFollowers || 0}
                             </p>
                           </div>
                         </div>

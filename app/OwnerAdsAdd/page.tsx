@@ -10,7 +10,6 @@ import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, 
-  Save, 
   Upload, 
   X,
   Calendar,
@@ -20,10 +19,7 @@ import {
   Globe,
   Store,
   Type,
-  FileText,
   Palette,
-  Megaphone,
-  Loader2,
   AlertCircle,
   PlusCircle
 } from "lucide-react";
@@ -102,7 +98,7 @@ export default function OwnerCreateAdPage() {
          }
     setLoading(true); // ⬅️ بعد التحقق فقط
       const response = await Axios({
-      ...SummaryApi.owner.get_bus_by_user, 
+      ...SummaryApi.owner.get_bus_by_id, 
       headers: { Authorization: `Bearer ${user.accessToken}`}
     });
      console.log("response bis",response)
